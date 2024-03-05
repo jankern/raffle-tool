@@ -1,0 +1,21 @@
+{
+  "name": "my-typescript-sass-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "start": "npm run build && npx live-server --port=8080 --open=../static/index.html",
+    "copy-html": "node copy-html.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.19.4",
+    "esbuild-plugin-copy": "^2.1.1",
+    "esbuild-plugin-sass": "^1.0.1",
+    "node-sass": "^9.0.0",
+    "typescript": "^5.2.2"
+  }
+}

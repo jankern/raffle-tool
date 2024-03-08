@@ -19,130 +19,56 @@
     /api/v1/import
 */
 
-class ApiClient {
-    private apiUrl: string;
+import { RaffleImplementation } from './Raffle';
+import { ParticipantImplementation } from './Participant';
+import "../scss/styles.scss";
 
-    constructor(apiUrl: string) {
-        this.apiUrl = apiUrl;
+// Define the parseCSV function
+function parseCSV() {
+    const csvTextArea = document.getElementById('csvTextArea') as HTMLTextAreaElement;
+    const csvData = csvTextArea.value.trim();
+
+    const rows = csvData.split('\n');
+    const headers = rows[0].split(';');
+
+    let tableHTML = '<table border="1"><thead><tr>';
+    headers.forEach(header => {
+        tableHTML += `<th>${header}</th>`;
+    });
+    tableHTML += '</tr></thead><tbody>';
+
+    for (let i = 1; i < rows.length; i++) {
+        const values = rows[i].split(';');
+        tableHTML += '<tr>';
+        values.forEach(value => {
+            tableHTML += `<td>${value}</td>`;
+        });
+        tableHTML += '</tr>';
     }
 
-    async get(endpoint: string) {
-        try {
-            const response = await fetch(this.apiUrl + endpoint);
-            if (response.ok) {
-                return await response.json();
-            } else {
-                throw new Error('GET request failed');
-            }
-        } catch (error) {
-            throw new Error('GET request error: ' + error);
-        }
-    }
+    tableHTML += '</tbody></table>';
 
-    async post(endpoint: string, contentType: string = 'application/json', data: any) {
-        try {
-            const response = await fetch(this.apiUrl + endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': contentType,
-                },
-                body: JSON.stringify(data),
-            });
-            if (response.ok) {
-                return await response.json();
-            } else {
-                throw new Error('POST request failed');
-            }
-        } catch (error) {
-            throw new Error('POST request error: ' + error);
-        }
-    }
-
-    async put(endpoint: string, contentType: string = 'application/json', data: any) {
-        try {
-            const response = await fetch(this.apiUrl + endpoint, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': contentType,
-                },
-                body: JSON.stringify(data),
-            });
-            if (response.ok) {
-                return await response.json();
-            } else {
-                throw new Error('PUT request failed');
-            }
-        } catch (error) {
-            throw new Error('PUT request error: ' + error);
-        }
-    }
-
-    async delete(endpoint: string, data: any) {
-        try {
-            const response = await fetch(this.apiUrl + endpoint, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-            if (response.ok) {
-                return await response.json();
-            } else {
-                throw new Error('PUT request failed');
-            }
-        } catch (error) {
-            throw new Error('PUT request error: ' + error);
-        }
+    const outputDiv = document.getElementById('output');
+    if (outputDiv) {
+        outputDiv.innerHTML = tableHTML;
+    } else {
+        console.error("Output div not found!");
     }
 }
 
-class ClickListener {
-    private apiClient: ApiClient;
+// Initiate raffle class
+const raffle = new RaffleImplementation("New", false, false);
+const participant = new ParticipantImplementation("Jan", "Pfillip", "jan@Pfillip.de", true);
+raffle.addParticipant(participant);
+console.log(raffle.getParticipantList());
 
-    constructor() {
-        this.apiClient = new ApiClient('http://127.0.0.1:8080/api/v1/');
-        this.addClickListeners();
+// Add a click event listener to a button or any other element
+document.addEventListener('DOMContentLoaded', function() {
+    const parseButton = document.getElementById('parseButton');
+    if (parseButton) {
+        parseButton.addEventListener('click', parseCSV);
+    } else {
+        console.error("Parse button not found!");
     }
-
-    private addClickListeners() {
-        const links = document.querySelectorAll('a');
-        links.forEach((link) => {
-            link.addEventListener('click', this.linkClickHandler.bind(this));
-        });
-
-        const buttons = document.querySelectorAll('button');
-        buttons.forEach((button) => {
-            button.addEventListener('click', this.buttonClickHandler.bind(this));
-        });
-    }
-
-    private async linkClickHandler(event: Event) {
-        event.preventDefault();
-        const link = event.target as HTMLAnchorElement;
-        console.log(`Clicked on link: ${link.href}`);
-        try {
-            const responseData = await this.apiClient.get(link.href);
-            console.log('GET response:', responseData);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    private async buttonClickHandler(event: Event) {
-        const button = event.target as HTMLButtonElement;
-        console.log(`Clicked on button: ${button.textContent}`);
-        try {
-            const responseData = await this.apiClient.post('/endpoint', 'application/json', { data: button.textContent });
-            console.log('POST response:', responseData);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    // Add methods for PUT and DELETE as needed
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    new ClickListener();
 });
+

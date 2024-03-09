@@ -21,7 +21,9 @@
 
 import { RaffleImplementation } from './Raffle';
 import { ParticipantImplementation } from './Participant';
+import { RaffleStateContainer } from './States';
 import "../scss/styles.scss";
+import { PriceImplementation } from './Price';
 
 // Define the parseCSV function
 function parseCSV() {
@@ -59,8 +61,24 @@ function parseCSV() {
 // Initiate raffle class
 const raffle = new RaffleImplementation("New", false, false);
 const participant = new ParticipantImplementation("Jan", "Pfillip", "jan@Pfillip.de", true);
+const price = new PriceImplementation("BLalbla Pricetext", true);
 raffle.addParticipant(participant);
 console.log(raffle.getParticipantList());
+
+// Create an instance of the state container
+const raffleStateContainer = new RaffleStateContainer({
+    name: "Name",
+    includeNewsletterParticipants: false,
+    numberOfParticipants: null,
+    hasPrizes: false,
+    participants: [participant],
+    prices: [price],
+    winners: [],
+});
+
+// Example of setting includeNewsletterParticipants
+raffleStateContainer.setIncludeNewsletterParticipants(true);
+console.log(raffleStateContainer.getState());
 
 // Add a click event listener to a button or any other element
 document.addEventListener('DOMContentLoaded', function() {

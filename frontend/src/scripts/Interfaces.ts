@@ -1,37 +1,49 @@
 export interface Participant {
-    firstName: string;
-    lastName: string;
+    name: string;
     email: string;
-    isSupporter: boolean;
+    supporterType: string;
+    isActive: boolean;
+    hasNewsletter: boolean;
 }
 
 export interface Price {
+    id: number;
     priceText: string;
 }
 
 export interface Winner {
-    firstName: string;
-    lastName: string;
+    id: number;
+    name: string;
     email: string;
-    priceText?: string | null;
-    winnerCount?: number | null;
+    priceId?: number | null;
+    index?: number | null;
 }
 
-export interface Raffle {
+// export interface Raffle {
+//     name: string;
+//     includeNewsletterParticipants: boolean;
+//     numberOfWinners?: number | null;
+//     hasPrizes: boolean;
+//     participants: Participant[];
+//     prices: Price[];
+//     winners: Winner[];
+
+//     addParticipant(participant: Participant): void;
+//     pickWinner(): Participant | null;
+//     addPrice(price: Price): void;
+//     removePrice(price: Price): void;
+//     getPrice(index: number): Price | null;
+//     addWinner(winner: Winner): void;
+//     removeWinner(winner: Winner): void;
+//     importParticipantsFromCSV(csvString: string, delimiter?: string): void;
+// }
+
+export interface RaffleState {
     name: string;
     includeNewsletterParticipants: boolean;
-    numberOfParticipants?: number | null;
-    hasPrizes: boolean;
+    numberOfWinners?: number | null;
+    //hasPrizes: boolean;
     participants: Participant[];
     prices: Price[];
     winners: Winner[];
-
-    addParticipant(participant: Participant): void;
-    pickWinner(): Participant | null;
-    addPrice(price: Price): void;
-    removePrice(price: Price): void;
-    getPrice(index: number): Price | null;
-    addWinner(winner: Winner): void;
-    removeWinner(winner: Winner): void;
-    importParticipantsFromCSV(csvString: string, delimiter?: string): void;
 }

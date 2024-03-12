@@ -19,6 +19,18 @@
     /api/v1/import
 */
 
+/**
+ * 
+ * Status
+ * form and state implemented
+ * next: 
+ * function to pick winner and update state
+ * clear state
+ * integrate material
+ * raffle animation ()
+ * 
+ */
+
 import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
@@ -27,7 +39,7 @@ import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    // JavaScript code for enabling/disabling input fields based on radio button selection
+    // Input elements
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
     const numberOfWinnersInput = document.getElementById('numberOfWinners') as HTMLInputElement;
     const pricesRadio = document.getElementById('pricesRadio') as HTMLInputElement;
@@ -37,11 +49,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
     const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
-    const validationOutput = document.getElementById('validation-text') as HTMLElement;
-    const participantsOutput = document.getElementById('participants') as HTMLElement;
+
+    // Output / summary elements
+    const validationOutput = document.getElementById('validation-output') as HTMLElement;
+    const participantsOutput = document.getElementById('participants-output') as HTMLElement;
+    const numberOfWinnersOutput = document.getElementById('number-of-winners-output') as HTMLElement;
+    const pricesOutput = document.getElementById('prices-output') as HTMLElement;
+    const hasNewsletterOutput = document.getElementById('has-newletter-output') as HTMLElement;
 
     if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate) {
 
+        // Eventmethod for winner number
         function numberOfWinnersRadioChange() {
             numberOfWinnersRadio.checked = true;
             numberOfWinnersInput.disabled = false;
@@ -59,8 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
+        // Eventlistener for winner number
         numberOfWinnersRadio.addEventListener('change', numberOfWinnersRadioChange);
 
+        // Eventlistener for add prices
         pricesRadio.addEventListener('change', function () {
             numberOfWinnersInput.disabled = true;
             addPriceButton.disabled = false;
@@ -100,8 +120,10 @@ document.addEventListener("DOMContentLoaded", () => {
             pricesContainer.appendChild(document.createElement('br'));
         });
 
+        // Eventlistener for create raffle, output summary and fill the state
         raffleCreate.addEventListener('click', function (event) {
-            //
+
+            // prevent form from general submit
             event.preventDefault();
 
             let validationText: string = "";
@@ -111,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let csvString: string = "";
             let participantEntries: string[] = [];
 
+            // Form validations
             if (raffleNameInput.value !== "") {
                 raffleName = raffleNameInput.value;
             } else {
@@ -143,8 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (numberOfWinnersRadio.checked) {
                 if (numberOfWinnersInput.value !== "" && +numberOfWinnersInput.value > 0) {
                     numberOfWinners = +numberOfWinnersInput.value;
-                    if (participantEntries.length-1 < numberOfWinners){
-                        validationText += "Es könne nicht mehr Gewinner als Teilnehmer definiert werden.<br>";
+                    if (participantEntries.length - 1 < numberOfWinners) {
+                        validationText += "Es können nicht mehr Gewinner als Teilnehmer definiert werden.<br>";
                     }
                 } else {
                     validationText += "Du musst eine gültige Gewinneranzahl eingeben.<br>";
@@ -164,26 +187,33 @@ document.addEventListener("DOMContentLoaded", () => {
                     validationText += "Du musst mindestens einen Preis angeben<br>";
                 }
 
-                if (participantEntries.length-1 < priceItems.length){
+                if (participantEntries.length - 1 < priceItems.length) {
                     validationText += "Es könne nicht mehr Preise als Teilnehmer definiert werden.<br>";
                 }
             }
 
+            // Submit form only if validation string is empty
             if (validationText === "") {
 
                 validationOutput.innerHTML = "";
+
+                // Fill state methods with list data for participant and prices
                 raffleStateContainer.importCSV(csvString);
                 raffleStateContainer.createPrices(priceItems);
 
+                // Fill state with simple variables
                 const state = {
                     name: raffleName,
                     includeNewsletterParticipants: includeNewsletterCheckbox.checked,
                     numberOfWinners: numberOfWinners
                 };
 
+                // Set state object
                 raffleStateContainer.setState(state);
                 console.log(raffleStateContainer.getState());
 
+                // Output summary
+                renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants);
 
             } else {
@@ -192,7 +222,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
 
+        // Call radio selection for winner at page load
         numberOfWinnersRadioChange();
+    }
+
+    function renderRaffleData(prices: Price[], numberOfWinners: (number | null | undefined), hasNewsletter: boolean) {
+
+        hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: V";
+        if (!hasNewsletter) {
+            hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: X";
+        }
+
+        if (numberOfWinners && numberOfWinners > 0) {
+            numberOfWinnersOutput.innerHTML = "Gewinner: "+numberOfWinners;
+        }else{
+            numberOfWinnersOutput.innerHTML = "Gewinner entsprechen der Anzahl der Preise ";
+        }
+
+        if(prices.length > 0){
+            let li = "<ul>";
+            prices.forEach(element => {
+                li += "<li>"+element.priceText+"</li>";
+            });
+            li += "</ul>";
+            pricesOutput.innerHTML = li;
+        }else{
+            pricesOutput.innerHTML = `Es werden keine gesonderten Preise definiert und nur ${numberOfWinners} Gewinner ermittelt`;
+        }
     }
 
     // Function to render the participant list on the HTML page
@@ -204,9 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let i = 0;
         participants.forEach(participant => {
             let row = "";
-            if(i <= 0){
+            if (i <= 0) {
                 row = `<th>${participant.name}</th><th>${participant.email}</th><th>${participant.supporterType}</th><th>isActive</th><th>hasNewsletter</th>`;
-            }else{
+            } else {
                 row = `<td>${participant.name}</td><td>${participant.email}</td><td>${participant.supporterType}</td><td>${participant.isActive}</td><td>${participant.hasNewsletter}</td>`;
             }
             table += `<tr>${row}</tr>`;

@@ -1,3 +1,21 @@
 body {
     background-color: aqua;
 }
+
+.raffle-data {
+    display:flex;
+    flex-wrap: wrap;
+    width:50%;
+    
+    div.info-box {
+        background:lightblue;
+        padding:10px;
+        width:50%;
+        box-sizing: border-box;
+
+        &.block {
+            background:red;
+            width: 100%;
+        }
+    }
+}

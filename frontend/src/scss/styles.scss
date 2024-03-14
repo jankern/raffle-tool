@@ -1,12 +1,69 @@
+// https://www.logicui.com/colorgenerator
+// Prim/Sec/Tert/Err - #E38312 #031136 #082CE2 #EC265B
+
+// $primary: #E38312;
+// $secondary: #031136;
+// $tertiary: #082CE2;
+$background: #fcfcfb;
+
+:root {
+    --primary: #E38312;
+    --on-primary: #FFFFFF;
+    --primary-container: #E6C7A3;
+    --on-primary-container: #331E04;
+    --secondary: #031136;
+    --on-secondary: #FFFFFF;
+    --secondary-container: #A1B3E6;
+    --on-secondary-container: #031033;
+    --tertiary: #082CE2;
+    --on-tertiary: #FFFFFF;
+    --tertiary-container: #A0ABE6;
+    --on-tertiary-container: #020A33;
+    --error: #EC265B;
+    --on-error: #FFFFFF;
+    --error-container: #E6A9B9;
+    --on-error-container: #330814;
+    --background: #fcfcfb;
+    --on-background: #333231;
+    --surface: #fcfcfb;
+    --on-surface: #333231;
+    --surface-variant: #e6dfd8;
+    --on-surface-variant: #665d53;
+    --outline: #998c7d;
+    --primary-dark: #E6BA87;
+    --on-primary-dark: #4C2C06;
+    --primary-container-dark: #663B08;
+    --on-primary-container-dark: #E6C7A3;
+    --secondary-dark: #859FE6;
+    --on-secondary-dark: #05184C;
+    --secondary-container-dark: #062066;
+    --on-secondary-container-dark: #A1B3E6;
+    --tertiary-dark: #8392E6;
+    --on-tertiary-dark: #030F4C;
+    --tertiary-container-dark: #041366;
+    --on-tertiary-container-dark: #A0ABE6;
+    --error-dark: #E68FA7;
+    --on-error-dark: #4C0C1E;
+    --error-container-dark: #661028;
+    --on-error-container-dark: #E6A9B9;
+    --background-dark: #333231;
+    --on-background-dark: #e6e4e2;
+    --surface-dark: #333231;
+    --on-surface-dark: #e6e4e2;
+    --surface-variant-dark: #665d53;
+    --on-surface-variant-dark: #e6ddd3;
+    --outline-dark: #b3a99e;
+}
+
 body {
-    background-color: aqua;
+    background-color: $background;
 }
 
 .raffle-data {
     display:flex;
     flex-wrap: wrap;
     width:50%;
-    
+
     div.info-box {
         background:lightblue;
         padding:10px;
@@ -14,7 +71,7 @@ body {
         box-sizing: border-box;
 
         &.block {
-            background:red;
+            background:lightgreen;
             width: 100%;
         }
     }

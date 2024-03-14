@@ -25,7 +25,8 @@
  * form and state implemented
  * next: 
  * function to pick winner and update state
- * clear state
+ * [v] clear state
+ * [v] Output summary
  * integrate material
  * raffle animation ()
  * 
@@ -46,6 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const addPriceButton = document.getElementById('addPriceButton') as HTMLButtonElement;
     const pricesContainer = document.getElementById('pricesContainer') as HTMLDivElement;
     const raffleCreate = document.getElementById('raffleCreate') as HTMLButtonElement;
+    const rafflePerform = document.getElementById('rafflePerform') as HTMLButtonElement;
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
     const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
@@ -57,7 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const pricesOutput = document.getElementById('prices-output') as HTMLElement;
     const hasNewsletterOutput = document.getElementById('has-newletter-output') as HTMLElement;
 
-    if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate) {
+    // Form input and submit logic and validation
+    if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform) {
 
         // Eventmethod for winner number
         function numberOfWinnersRadioChange() {
@@ -146,15 +149,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 csvString = `Name;Email;SequencerTalk Supporter;Active;Newsletter
                 Sophia Müller;user1@example.de;Sinus;ja;nein
                 Lukas Schmidt;user2@example.de;Sinus;ja;nein
-                Emma Wagner;user3@example.de;Sinus;ja;nein`;
-                // Leon Fischer;user4@example.de;Sinus;ja;nein
-                // Hannah Weber;user5@example.de;Sinus;ja;nein
-                // Maximilian Becker;user6@example.de;Sinus;ja;nein
-                // Mia Schneider;user7@example.de;Sinus;ja;nein
-                // Elias Richter;user8@example.de;Sinus;ja;nein
-                // Emilia Keller;user9@example.de;Sinus;ja;nein
-                // Jonas Meier;user10@example.de;Sinus;ja;nein
-                // Laura Schäfer;user11@example.de;Sinus;ja;nein`;
+                Emma Wagner;user3@example.de;Sinus;ja;nein
+                Leon Fischer;user4@example.de;Sinus;ja;nein
+                Hannah Weber;user5@example.de;Sinus;ja;nein
+                Maximilian Becker;user6@example.de;Sinus;ja;nein
+                Mia Schneider;user7@example.de;Sinus;ja;nein
+                Elias Richter;user8@example.de;Sinus;ja;nein
+                Emilia Keller;user9@example.de;Sinus;ja;nein
+                Jonas Meier;user10@example.de;Sinus;ja;nein
+                Laura Schäfer;user11@example.de;Sinus;ja;nein`;
 
                 participantEntries = csvString.split('\n');
 
@@ -213,8 +216,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(raffleStateContainer.getState());
 
                 // Output summary
-                renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
-                renderParticipantList(raffleStateContainer.getState().participants);
+                const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
+                renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
             } else {
                 validationOutput.innerHTML = validationText;
@@ -222,55 +225,70 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
 
+        rafflePerform.addEventListener('click', function (event) {
+            
+            // Determining the winners and optional priceId's
+            if(raffleStateContainer.getState().winners.length <= 0){
+                raffleStateContainer.addWinners(raffle.pickWinners());
+                console.log('Winner picked');
+                console.log(raffleStateContainer.getState());
+            }
+
+            // 
+
+        });
+
         // Call radio selection for winner at page load
         numberOfWinnersRadioChange();
     }
 
-    function renderRaffleData(prices: Price[], numberOfWinners: (number | null | undefined), hasNewsletter: boolean) {
+    // Function to render the raffle data on the HTML page except participants
+    function renderRaffleData(prices: Price[], numberOfWinners: (number | null | undefined), hasNewsletter: boolean): number {
 
+        let numberOfWinnersTotal :number = 0;
         hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: V";
         if (!hasNewsletter) {
             hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: X";
         }
 
         if (numberOfWinners && numberOfWinners > 0) {
-            numberOfWinnersOutput.innerHTML = "Gewinner: "+numberOfWinners;
-        }else{
-            numberOfWinnersOutput.innerHTML = "Gewinner entsprechen der Anzahl der Preise ";
+            numberOfWinnersTotal = numberOfWinners;
+            numberOfWinnersOutput.innerHTML = "Ohne Preiszuordnung wird folgende Gewinneranzahl ausgelost: "+numberOfWinners;
         }
 
         if(prices.length > 0){
+            numberOfWinnersTotal = prices.length;
+            numberOfWinnersOutput.innerHTML = "Mit Preiszuordnung wird folgende Gewinneranzahl ausgelost: "+(prices.length);
+        }
+
+        if(prices.length > 0){
+            pricesOutput.innerHTML = `Diese Preise werden an die Gewinner verteilt:`;
             let li = "<ul>";
             prices.forEach(element => {
                 li += "<li>"+element.priceText+"</li>";
             });
             li += "</ul>";
-            pricesOutput.innerHTML = li;
+            pricesOutput.innerHTML += li;
         }else{
-            pricesOutput.innerHTML = `Es werden keine gesonderten Preise definiert und nur ${numberOfWinners} Gewinner ermittelt`;
+            pricesOutput.innerHTML = ``;
         }
+
+        return numberOfWinnersTotal;
     }
 
     // Function to render the participant list on the HTML page
-    function renderParticipantList(participants: Participant[]) {
+    function renderParticipantList(participants: Participant[], numberOfWinnersTotal: number) {
 
-        participantsOutput.innerHTML = ""; // Clear previous list
-        let table = "<table>";
+        participantsOutput.innerHTML = `Die ${numberOfWinnersTotal} Gewinner werden aus folgender Liste ermittelt:<br>`;
+        let table = `<table><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th>`;
 
-        let i = 0;
         participants.forEach(participant => {
-            let row = "";
-            if (i <= 0) {
-                row = `<th>${participant.name}</th><th>${participant.email}</th><th>${participant.supporterType}</th><th>isActive</th><th>hasNewsletter</th>`;
-            } else {
-                row = `<td>${participant.name}</td><td>${participant.email}</td><td>${participant.supporterType}</td><td>${participant.isActive}</td><td>${participant.hasNewsletter}</td>`;
-            }
+            let row = `<td>${participant.name}</td><td>${participant.email}</td><td>${participant.supporterType}</td><td>${participant.isActive}</td><td>${participant.hasNewsletter}</td>`;
             table += `<tr>${row}</tr>`;
-            i += 1;
         });
 
         table += "</table>";
-        participantsOutput.innerHTML = table;
+        participantsOutput.innerHTML += table;
     }
 
     // Function to update form inputs with state values
@@ -296,13 +314,15 @@ document.addEventListener("DOMContentLoaded", () => {
         numberOfWinners: null,
         participants: [],
         prices: [],
-        winners: []
+        winners: [],
+        view: "config",
+        determinationType: "simultaneously"
     };
 
     // Create an instance of the state container
     const raffleStateContainer = new RaffleStateContainer(initialState);
 
-    // Create an instance of the Raffle class with the state container
+    // Create an instance of the Raffle class (business logic) with the state container
     const raffle = new Raffle(raffleStateContainer);
 
     // Example usage of Raffle class

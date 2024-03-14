@@ -15,31 +15,35 @@ export class RaffleStateContainer {
         this.state = { ...this.state, ...newState };
     }
 
-    setIncludeNewsletterParticipants(value: boolean) {
-        this.setState({ includeNewsletterParticipants: value });
-    }
+    // setIncludeNewsletterParticipants(value: boolean) {
+    //     this.setState({ includeNewsletterParticipants: value });
+    // }
 
     importCSV(csvText: string) {
         // Parse CSV text
         const rows = csvText.split('\n');
         const participants: Participant[] = [];
 
+        let i = 0;
         for (const row of rows) {
-            const [name, email, supporterType, isActiveStr, hasNewsletterStr] = row.split(';').map(item => item.trim());
-            const isActive = isActiveStr.toLowerCase() === ('ja' || 'yes' || 'true');
-            const hasNewsletter = hasNewsletterStr.toLowerCase() === ('ja' || 'yes' || 'true');
-            
-            participants.push({ name, email, supporterType, isActive, hasNewsletter });
+            if (i > 0) {
+                const [name, email, supporterType, isActiveStr, hasNewsletterStr] = row.split(';').map(item => item.trim());
+                const isActive = isActiveStr.toLowerCase() === ('ja' || 'yes' || 'true');
+                const hasNewsletter = hasNewsletterStr.toLowerCase() === ('ja' || 'yes' || 'true');
+
+                participants.push({ name, email, supporterType, isActive, hasNewsletter });
+            }
+            i += 1;
         }
 
         // Update state with new participants
         this.setState({ participants });
     }
 
-    createPrices(priceInputs: string[]){
+    createPrices(priceInputs: string[]) {
 
         const prices: Price[] = [];
-        
+
         let i: number = 1;
         for (const row of priceInputs) {
             prices.push({ id: i, priceText: row });
@@ -47,6 +51,10 @@ export class RaffleStateContainer {
         }
 
         this.setState({ prices });
+    }
+
+    addWinners(winners: Winner[]){
+        this.setState({winners});
     }
 
     // Add other state management methods as needed

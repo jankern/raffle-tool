@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
     const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
+    const determinationTypeRadios = document.querySelectorAll<HTMLInputElement>('input[name="determinationType"]');
 
     // Output / summary elements
     const validationOutput = document.getElementById('validation-output') as HTMLElement;
@@ -60,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const hasNewsletterOutput = document.getElementById('has-newletter-output') as HTMLElement;
 
     // Form input and submit logic and validation
-    if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform) {
+    if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform && determinationTypeRadios) {
 
         // Eventmethod for winner number
         function numberOfWinnersRadioChange() {
@@ -219,14 +220,25 @@ document.addEventListener("DOMContentLoaded", () => {
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
+                // set veiw state
+                raffleStateContainer.setState({view: "view"});
+
             } else {
                 validationOutput.innerHTML = validationText;
             }
 
         });
 
+        determinationTypeRadios.forEach(radio => {
+            radio.addEventListener('change', function (event) {
+                const checkedValue = (document.querySelector<HTMLInputElement>('input[name="determinationType"]:checked') as HTMLInputElement)?.value;
+                raffleStateContainer.setState({determinationType: checkedValue});
+            });
+        });
+
         rafflePerform.addEventListener('click', function (event) {
             
+            event.preventDefault();
             // Determining the winners and optional priceId's
             if(raffleStateContainer.getState().winners.length <= 0){
                 raffleStateContainer.addWinners(raffle.pickWinners());
@@ -234,7 +246,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(raffleStateContainer.getState());
             }
 
-            // 
+            // set veiw state
+            raffleStateContainer.setState({view: "perform"});
+
+            // TODO
 
         });
 
@@ -315,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
         participants: [],
         prices: [],
         winners: [],
-        view: "config",
+        view: "create",
         determinationType: "simultaneously"
     };
 

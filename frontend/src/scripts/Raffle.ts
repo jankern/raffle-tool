@@ -8,19 +8,6 @@ export class Raffle {
         this.stateContainer = stateContainer;
     }
 
-    // Example method for business logic
-    pickWinner(): Participant | null {
-        console.log('IN PICK A WINNER');
-        
-        const participants = this.stateContainer.getState().participants;
-        if (participants.length === 0) {
-            return null;
-        }
-
-        const winnerIndex = Math.floor(Math.random() * participants.length);
-        return participants[winnerIndex];
-    }
-
     // Function to pick winners from the participant list and return them
     pickWinners(): Winner[] {
         const participants: Participant[] = this.stateContainer.getState().participants;
@@ -65,7 +52,4 @@ export class Raffle {
         }
         return winners;
     }
-    
-
-    // Add other business logic methods as needed
 }

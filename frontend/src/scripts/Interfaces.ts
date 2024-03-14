@@ -26,6 +26,6 @@ export interface RaffleState {
     participants: Participant[];
     prices: Price[];
     winners: Winner[];
-    view: string; // config / overview / raffle
+    view: string; // create / view / perform
     determinationType: string; // simultaneously / consecutively
 }

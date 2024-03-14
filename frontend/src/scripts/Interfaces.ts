@@ -1,7 +1,7 @@
 export interface Participant {
     name: string;
     email: string;
-    supporterType: string;
+    supporterType: string | null;
     isActive: boolean;
     hasNewsletter: boolean;
 }
@@ -15,6 +15,7 @@ export interface Winner {
     id: number;
     name: string;
     email: string;
+    isSupporter: boolean;
     priceId?: number | null;
     index?: number | null;
 }

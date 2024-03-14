@@ -149,29 +149,51 @@ document.addEventListener("DOMContentLoaded", () => {
                 // import participants
                 csvString = `Name;Email;SequencerTalk Supporter;Active;Newsletter
                 Sophia Müller;user1@example.de;Sinus;ja;nein
-                Lukas Schmidt;user2@example.de;Sinus;ja;nein
-                Emma Wagner;user3@example.de;Sinus;ja;nein
+                Lukas Schmidt;user2@example.de-;;nein;ja
+                Emma Wagner;user3@example.de-;;nein;ja
                 Leon Fischer;user4@example.de;Sinus;ja;nein
                 Hannah Weber;user5@example.de;Sinus;ja;nein
                 Maximilian Becker;user6@example.de;Sinus;ja;nein
-                Mia Schneider;user7@example.de;Sinus;ja;nein
+                Mia Schneider;user7@example.de-;;nein;ja
                 Elias Richter;user8@example.de;Sinus;ja;nein
                 Emilia Keller;user9@example.de;Sinus;ja;nein
                 Jonas Meier;user10@example.de;Sinus;ja;nein
-                Laura Schäfer;user11@example.de;Sinus;ja;nein`;
+                Laura Schäfer;user11@example.de---;Sinus;;nein;
+                Lars Klingbeil;user12@example.de---;;nein;nein;
+                Susanne Herzensangelegenheit;user13@example.de---;;nein;nein;
+                Wanda Alhandra;user14@example.de-;;nein;ja`;
 
+                // Validieren
                 participantEntries = csvString.split('\n');
+
+                // Fill state methods with list data for participant and prices
+                raffleStateContainer.importCSV(csvString);
 
             } else {
                 validationText += "Du musst CSV-Text in das Textfeld kopieren.<br>";
             }
 
+            let i = 0;
+            let participantLengthWithSupporterOrNewsletter = 0;
+            while (i < raffleStateContainer.getState().participants.length) {
+
+                if(raffleStateContainer.getState().participants[i].isActive ){
+                    participantLengthWithSupporterOrNewsletter += 1;
+                }
+
+                if(includeNewsletterCheckbox.checked){
+                    if(raffleStateContainer.getState().participants[i].hasNewsletter ){
+                        participantLengthWithSupporterOrNewsletter += 1;
+                    }
+                }
+                i += 1;
+            }
 
             if (numberOfWinnersRadio.checked) {
                 if (numberOfWinnersInput.value !== "" && +numberOfWinnersInput.value > 0) {
                     numberOfWinners = +numberOfWinnersInput.value;
-                    if (participantEntries.length - 1 < numberOfWinners) {
-                        validationText += "Es können nicht mehr Gewinner als Teilnehmer definiert werden.<br>";
+                    if (participantLengthWithSupporterOrNewsletter < numberOfWinners) {
+                        validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren.<br>";
                     }
                 } else {
                     validationText += "Du musst eine gültige Gewinneranzahl eingeben.<br>";
@@ -191,8 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     validationText += "Du musst mindestens einen Preis angeben<br>";
                 }
 
-                if (participantEntries.length - 1 < priceItems.length) {
-                    validationText += "Es könne nicht mehr Preise als Teilnehmer definiert werden.<br>";
+                if (participantLengthWithSupporterOrNewsletter < priceItems.length) {
+                    validationText += "Du kannst nicht mehr Preise als Teilnehmer definieren.<br>";
                 }
             }
 
@@ -202,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 validationOutput.innerHTML = "";
 
                 // Fill state methods with list data for participant and prices
-                raffleStateContainer.importCSV(csvString);
+                //raffleStateContainer.importCSV(csvString);
                 raffleStateContainer.createPrices(priceItems);
 
                 // Fill state with simple variables
@@ -239,17 +261,31 @@ document.addEventListener("DOMContentLoaded", () => {
         rafflePerform.addEventListener('click', function (event) {
             
             event.preventDefault();
-            // Determining the winners and optional priceId's
-            if(raffleStateContainer.getState().winners.length <= 0){
-                raffleStateContainer.addWinners(raffle.pickWinners());
-                console.log('Winner picked');
-                console.log(raffleStateContainer.getState());
-            }
 
             // set veiw state
             raffleStateContainer.setState({view: "perform"});
 
-            // TODO
+            // Determining the winners and optional priceId's
+            //if(raffleStateContainer.getState().winners.length <= 0){
+                raffleStateContainer.addWinners(raffle.pickWinners());
+                console.log('Winner picked');
+                console.log(raffleStateContainer.getState());
+            //}
+
+            // set veiw state
+            raffleStateContainer.setState({view: "perform"});
+
+            // check amountofwinner not bigger isactive  / hasnewsletter
+
+            // TODO Get price text from state if prices are assigned
+            // TODO reverse winner state to a new varriable to start with last one
+            
+            // TODO check which determinationType is selected
+            // if nacheinander each step has to be confirmed by button
+            // if gleichzeitig all will be displayed
+
+            // overview will be udpate for price and list
+            // Winners with prices and only first anem will be printed
 
         });
 
@@ -268,13 +304,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (numberOfWinners && numberOfWinners > 0) {
             numberOfWinnersTotal = numberOfWinners;
-            numberOfWinnersOutput.innerHTML = "Ohne Preiszuordnung wird folgende Gewinneranzahl ausgelost: "+numberOfWinners;
         }
 
         if(prices.length > 0){
             numberOfWinnersTotal = prices.length;
-            numberOfWinnersOutput.innerHTML = "Mit Preiszuordnung wird folgende Gewinneranzahl ausgelost: "+(prices.length);
         }
+
+        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: "+numberOfWinnersTotal;
 
         if(prices.length > 0){
             pricesOutput.innerHTML = `Diese Preise werden an die Gewinner verteilt:`;
@@ -285,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
             li += "</ul>";
             pricesOutput.innerHTML += li;
         }else{
-            pricesOutput.innerHTML = ``;
+            pricesOutput.innerHTML = `Es sind keine gesonderten Preise definiert. Es werden nur Gewinner bestimmt.`;
         }
 
         return numberOfWinnersTotal;

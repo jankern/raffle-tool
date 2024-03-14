@@ -27,12 +27,25 @@ export class Raffle {
                 
                 while (winners.length < numberOfWinners) {
                     const randomIndex = Math.floor(Math.random() * participants.length);
-                    if (!selectedIndexes.has(randomIndex)) {
-                        
+
+                    let isSupporterOrHasNewsletter: boolean = false;
+                    if(participants[randomIndex].isActive){
+                        isSupporterOrHasNewsletter = true;
+                    }
+
+                    if(this.stateContainer.getState().includeNewsletterParticipants){
+                        if(participants[randomIndex].hasNewsletter){
+                            isSupporterOrHasNewsletter = true;
+                        }
+                    }
+
+                    if (!selectedIndexes.has(randomIndex) && isSupporterOrHasNewsletter) {
+
                         let winner: Winner = {
                             id: winners.length + 1,
                             name: participants[randomIndex].name,
                             email: participants[randomIndex].email,
+                            isSupporter: participants[randomIndex].isActive,
                             priceId: null,
                             index: randomIndex // Storing the index of the winner in the original participants array
                         }

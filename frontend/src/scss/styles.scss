@@ -13,12 +13,12 @@ $background: #fcfcfb;
 // @use "@material/checkbox/mdc-checkbox";
 // @use "@material/table/mdc-table";
 
-// @use '@material/web/button/filled-button';
+@use '../../node_modules/@material/web/button/filled-button';
 // @use '@material/web/button/outlined-button';
-// @use '@material/web/checkbox/checkbox';
+@use '../../node_modules/@material/web/checkbox/checkbox';
 // @use '@material/web/chips/suggestion-chip';
 // @use '@material/web/field/filled-field';
-// @use '@material/web/radio/radio';
+@use '../../node_modules/@material/web/radio/radio';
 // @use '@material/web/textfield/filled-text-field';
 // @use '@material/web/textfield/outlined-text-field';
 
@@ -92,7 +92,7 @@ header {
 .content-wrapper {
   display: flex;
   justify-content: center;
-  background: $primary;
+  // background: $primary;
   height: calc(100% - 150px);
   width:100%;
 }

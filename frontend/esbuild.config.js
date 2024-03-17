@@ -10,7 +10,7 @@ esbuild
     sourcemap: false,
     //watch: true,
     minify: false, // Minify the output
-    target: 'es2025', // Specify the target ECMAScript version
+    target: 'es2015', // Specify the target ECMAScript version
     loader: {
       '.png': 'file', // Use the file loader for PNG files
       '.jpg': 'file',
@@ -31,6 +31,7 @@ esbuild
           from: ["../templates/index.html"],
           to: ["../build/sequencer-talk-raffle-tool/"],
         },
+       // watch: true,
       }),
     ],
   })

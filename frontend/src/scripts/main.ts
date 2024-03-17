@@ -36,14 +36,14 @@ import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
 
-// import '@material/web/button/filled-button';
-// import '@material/web/button/outlined-button';
-// import '@material/web/checkbox/checkbox';
-// import '@material/web/chips/suggestion-chip';
-// import '@material/web/field/filled-field';
-// import '@material/web/radio/radio';
-// import '@material/web/textfield/filled-text-field';
-// import '@material/web/textfield/outlined-text-field';
+import '@material/web/button/filled-button';
+import '@material/web/button/outlined-button';
+import '@material/web/checkbox/checkbox';
+import '@material/web/chips/suggestion-chip';
+import '@material/web/field/filled-field';
+import '@material/web/radio/radio';
+import '@material/web/textfield/filled-text-field';
+import '@material/web/textfield/outlined-text-field';
 
 import "../scss/styles.scss";
 

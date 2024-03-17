@@ -36,6 +36,15 @@ import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
 
+// import '@material/web/button/filled-button';
+// import '@material/web/button/outlined-button';
+// import '@material/web/checkbox/checkbox';
+// import '@material/web/chips/suggestion-chip';
+// import '@material/web/field/filled-field';
+// import '@material/web/radio/radio';
+// import '@material/web/textfield/filled-text-field';
+// import '@material/web/textfield/outlined-text-field';
+
 import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -48,6 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const pricesContainer = document.getElementById('pricesContainer') as HTMLDivElement;
     const raffleCreate = document.getElementById('raffleCreate') as HTMLButtonElement;
     const rafflePerform = document.getElementById('rafflePerform') as HTMLButtonElement;
+    const raffleRepeat = document.getElementById('raffleRepeat') as HTMLButtonElement;
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
     const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
@@ -59,6 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const numberOfWinnersOutput = document.getElementById('number-of-winners-output') as HTMLElement;
     const pricesOutput = document.getElementById('prices-output') as HTMLElement;
     const hasNewsletterOutput = document.getElementById('has-newletter-output') as HTMLElement;
+    const winnerOutput = document.getElementById('winner-output') as HTMLElement;
+
+    let consecutivelyIterator: number = 0;
+    let winnersReverseWithPrice: Winner[] = [];
 
     // Form input and submit logic and validation
     if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform && determinationTypeRadios) {
@@ -163,6 +177,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 Susanne Herzensangelegenheit;user13@example.de---;;nein;nein;
                 Wanda Alhandra;user14@example.de-;;nein;ja`;
 
+                // Example usage:
+                //const csvString = `John,Doe,john@example.com\nJane,Smith,jane@example.com`;
+                if (validateCSV(csvString)) {
+                    // Proceed with importing the CSV string
+                    raffleStateContainer.importCSV(csvString);
+                } else {
+                    // Handle invalid CSV string
+                    validationText += "Das CSV-Format ist nicht korrekt.<br>";
+                }
+
                 // Validieren
                 participantEntries = csvString.split('\n');
 
@@ -177,12 +201,12 @@ document.addEventListener("DOMContentLoaded", () => {
             let participantLengthWithSupporterOrNewsletter = 0;
             while (i < raffleStateContainer.getState().participants.length) {
 
-                if(raffleStateContainer.getState().participants[i].isActive ){
+                if (raffleStateContainer.getState().participants[i].isActive) {
                     participantLengthWithSupporterOrNewsletter += 1;
                 }
 
-                if(includeNewsletterCheckbox.checked){
-                    if(raffleStateContainer.getState().participants[i].hasNewsletter ){
+                if (includeNewsletterCheckbox.checked) {
+                    if (raffleStateContainer.getState().participants[i].hasNewsletter) {
                         participantLengthWithSupporterOrNewsletter += 1;
                     }
                 }
@@ -223,8 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 validationOutput.innerHTML = "";
 
-                // Fill state methods with list data for participant and prices
-                //raffleStateContainer.importCSV(csvString);
+                // Fill state methods with list data for prices
                 raffleStateContainer.createPrices(priceItems);
 
                 // Fill state with simple variables
@@ -236,14 +259,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Set state object
                 raffleStateContainer.setState(state);
-                console.log(raffleStateContainer.getState());
 
                 // Output summary
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
                 // set veiw state
-                raffleStateContainer.setState({view: "view"});
+                raffleStateContainer.setState({ view: "summary" });
 
             } else {
                 validationOutput.innerHTML = validationText;
@@ -254,39 +276,66 @@ document.addEventListener("DOMContentLoaded", () => {
         determinationTypeRadios.forEach(radio => {
             radio.addEventListener('change', function (event) {
                 const checkedValue = (document.querySelector<HTMLInputElement>('input[name="determinationType"]:checked') as HTMLInputElement)?.value;
-                raffleStateContainer.setState({determinationType: checkedValue});
+                raffleStateContainer.setState({ determinationType: checkedValue });
             });
         });
 
         rafflePerform.addEventListener('click', function (event) {
-            
             event.preventDefault();
 
-            // set veiw state
-            raffleStateContainer.setState({view: "perform"});
+            // Set view state
+            raffleStateContainer.setState({ view: "raffle" });
 
-            // Determining the winners and optional priceId's
-            //if(raffleStateContainer.getState().winners.length <= 0){
+            // Determine the winners and optional priceId's
+            if (raffleStateContainer.getState().winners.length <= 0) {
                 raffleStateContainer.addWinners(raffle.pickWinners());
-                console.log('Winner picked');
+                updateParticipantListAndPrices();
+                console.log('Winners picked');
                 console.log(raffleStateContainer.getState());
-            //}
+            }
 
-            // set veiw state
-            raffleStateContainer.setState({view: "perform"});
+            // Reverse array and add price if needed
+            const reversedWinners: Winner[] = [...raffleStateContainer.getState().winners].reverse();
 
-            // check amountofwinner not bigger isactive  / hasnewsletter
+            if (raffleStateContainer.getState().determinationType === "simultaneously") {
+                // Print all winners together in reversed order
+                winnerOutput.innerHTML = reversedWinners.reverse().map(winner => {
+                    let priceText = "";
+                    if (raffleStateContainer.getState().prices.length > 0) {
+                        const price = raffleStateContainer.getState().prices.find(price => price.id === winner.priceId);
+                        if (price) {
+                            priceText = "<br>" + price.priceText;
+                        }
+                    }
+                    return `<div class="info-box">${winner.id} ${winner.name}${priceText}</div>`;
+                }).join('');
+            } else {
+                // Print winners consecutively
+                console.log('in consecutively');
+                if (consecutivelyIterator < reversedWinners.length) {
+                    const winner = reversedWinners[consecutivelyIterator];
+                    let priceText = "";
+                    if (raffleStateContainer.getState().prices.length > 0) {
+                        const price = raffleStateContainer.getState().prices.find(price => price.id === winner.priceId);
+                        if (price) {
+                            priceText = "<br>" + price.priceText;
+                        }
+                    }
+                    let el = document.createElement("div");
+                    el.className = "info-box";
+                    winnerOutput.prepend(el);
+                    el.innerHTML = `${winner.id} ${winner.name}${priceText}`;
+                    consecutivelyIterator++;
+                } else {
+                    //consecutivelyIterator = 0; // Reset iterator if reached the end of the array
+                }
+            }
+        });
 
-            // TODO Get price text from state if prices are assigned
-            // TODO reverse winner state to a new varriable to start with last one
-            
-            // TODO check which determinationType is selected
-            // if nacheinander each step has to be confirmed by button
-            // if gleichzeitig all will be displayed
-
-            // overview will be udpate for price and list
-            // Winners with prices and only first anem will be printed
-
+        raffleRepeat.addEventListener('click', function (event) {
+            raffleStateContainer.setState({ winners: [] });
+            winnerOutput.innerHTML = "";
+            consecutivelyIterator = 0;
         });
 
         // Call radio selection for winner at page load
@@ -296,7 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to render the raffle data on the HTML page except participants
     function renderRaffleData(prices: Price[], numberOfWinners: (number | null | undefined), hasNewsletter: boolean): number {
 
-        let numberOfWinnersTotal :number = 0;
+        let numberOfWinnersTotal: number = 0;
         hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: V";
         if (!hasNewsletter) {
             hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: X";
@@ -306,21 +355,21 @@ document.addEventListener("DOMContentLoaded", () => {
             numberOfWinnersTotal = numberOfWinners;
         }
 
-        if(prices.length > 0){
+        if (prices.length > 0) {
             numberOfWinnersTotal = prices.length;
         }
 
-        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: "+numberOfWinnersTotal;
+        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: " + numberOfWinnersTotal;
 
-        if(prices.length > 0){
+        if (prices.length > 0) {
             pricesOutput.innerHTML = `Diese Preise werden an die Gewinner verteilt:`;
             let li = "<ul>";
             prices.forEach(element => {
-                li += "<li>"+element.priceText+"</li>";
+                li += "<li id=" + element.id + ">" + element.priceText + "</li>";
             });
             li += "</ul>";
             pricesOutput.innerHTML += li;
-        }else{
+        } else {
             pricesOutput.innerHTML = `Es sind keine gesonderten Preise definiert. Es werden nur Gewinner bestimmt.`;
         }
 
@@ -331,15 +380,62 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderParticipantList(participants: Participant[], numberOfWinnersTotal: number) {
 
         participantsOutput.innerHTML = `Die ${numberOfWinnersTotal} Gewinner werden aus folgender Liste ermittelt:<br>`;
-        let table = `<table><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th>`;
+        let table = `<table id="participantTable"><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th>`;
 
         participants.forEach(participant => {
+
+            let willbePrinted: boolean = false;
+
+            if (participant.isActive) {
+                willbePrinted = true;
+            }
+
+            if (includeNewsletterCheckbox.checked) {
+                if (participant.hasNewsletter) {
+                    willbePrinted = true;
+                }
+            }
+
+            let className = "excluded-from-raffle";
+            if (willbePrinted) {
+                className = "";
+            }
+
             let row = `<td>${participant.name}</td><td>${participant.email}</td><td>${participant.supporterType}</td><td>${participant.isActive}</td><td>${participant.hasNewsletter}</td>`;
-            table += `<tr>${row}</tr>`;
+            table += `<tr class="${className}" id="${participant.id}">${row}</tr>`;
         });
 
         table += "</table>";
         participantsOutput.innerHTML += table;
+    }
+
+    function updateParticipantListAndPrices() {
+
+        if (raffleStateContainer.getState().winners.length > 0) {
+
+            const winnerTableRows = document.querySelectorAll('#participantTable tbody tr');
+
+            if (winnerTableRows && winnerTableRows.length > 0) {
+                raffleStateContainer.getState().winners.forEach(winner => {
+                    const participantId = winner.participantId;
+                    winnerTableRows.forEach(row => {
+                        if (winner.participantId === +row.id) {
+                            row.className = 'winner';
+                        }
+                    });
+
+                    if (raffleStateContainer.getState().prices.length > 0) {
+                        const pricesListItems = document.querySelectorAll('#prices-output li');
+                        pricesListItems.forEach(item => {
+                            if (winner.priceId === +item.id) {
+                                item.innerHTML += " - " + winner.name;
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
     }
 
     // Function to update form inputs with state values
@@ -356,6 +452,23 @@ document.addEventListener("DOMContentLoaded", () => {
             includeNewsletterCheckbox.checked = state.includeNewsletterParticipants;
             numberOfWinnersInput.value = state.numberOfWinners ? state.numberOfWinners.toString() : '';
         }
+    }
+
+    function validateCSV(csvString: string): boolean {
+        // Split the CSV string into lines
+        const lines = csvString.trim().split('\n');
+
+        // Check if there is at least one line in the CSV
+        if (lines.length === 0) {
+            console.error("CSV string is empty.");
+            return false;
+        }
+
+        // Assuming each line represents a participant, you can perform further validation on each line if needed
+        // For example, you might check if each line has the expected number of fields, if fields are properly formatted, etc.
+
+        // If the CSV string passes all validation checks, return true
+        return true;
     }
 
     // Define initial state

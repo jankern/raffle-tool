@@ -46,6 +46,7 @@ export class Raffle {
                             name: participants[randomIndex].name,
                             email: participants[randomIndex].email,
                             isSupporter: participants[randomIndex].isActive,
+                            participantId: participants[randomIndex].id,
                             priceId: null,
                             index: randomIndex // Storing the index of the winner in the original participants array
                         }

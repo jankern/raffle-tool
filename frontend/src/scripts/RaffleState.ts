@@ -31,7 +31,7 @@ export class RaffleStateContainer {
                 const isActive = isActiveStr.toLowerCase() === ('ja' || 'yes' || 'true');
                 const hasNewsletter = hasNewsletterStr.toLowerCase() === ('ja' || 'yes' || 'true');
 
-                participants.push({ name, email, supporterType, isActive, hasNewsletter });
+                participants.push({ id:i, name, email, supporterType, isActive, hasNewsletter });
             }
             i += 1;
         }

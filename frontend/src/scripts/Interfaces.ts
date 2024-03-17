@@ -1,4 +1,5 @@
 export interface Participant {
+    id: number;
     name: string;
     email: string;
     supporterType: string | null;
@@ -16,7 +17,9 @@ export interface Winner {
     name: string;
     email: string;
     isSupporter: boolean;
+    participantId: number;
     priceId?: number | null;
+    priceText?: string;
     index?: number | null;
 }
 
@@ -27,6 +30,6 @@ export interface RaffleState {
     participants: Participant[];
     prices: Price[];
     winners: Winner[];
-    view: string; // create / view / perform
+    view: string; // create / summary / perform
     determinationType: string; // simultaneously / consecutively
 }

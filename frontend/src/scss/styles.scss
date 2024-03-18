@@ -5,22 +5,36 @@ $primary: #e38312;
 $secondary: #031136;
 $tertiary: #082ce2;
 $error: #ec265b;
+$erros-background: #e6a9b9;
 $background: #fcfcfb;
+$disabled: #998c7d;
+$disabled-font: #e6dfd8;
+$navigation: #e6e4e2;
 
-// @use "@material/textfield/mdc-text-field";
-// @use "@material/radio/mdc-radio";
-// @use "@material/textarea/mdc-textarea";
-// @use "@material/checkbox/mdc-checkbox";
-// @use "@material/table/mdc-table";
+// Font weights
+$light: 300;
+$regular: 500;
+$medium: 600;
+$bold: 700;
 
-@use '../../node_modules/@material/web/button/filled-button';
-// @use '@material/web/button/outlined-button';
-@use '../../node_modules/@material/web/checkbox/checkbox';
-// @use '@material/web/chips/suggestion-chip';
-// @use '@material/web/field/filled-field';
-@use '../../node_modules/@material/web/radio/radio';
-// @use '@material/web/textfield/filled-text-field';
-// @use '@material/web/textfield/outlined-text-field';
+// Base Font
+$base-font-family: sans-serif;
+$base-font: "Hind Siliguri";
+$base-font-weight: $light;
+$base-font-size: 18px;
+$base-line-height: 26px;
+
+$header1-font-weight: $bold;
+$header2-font-weight: $regular;
+
+// @use '../../node_modules/@material/web/button/filled-button';
+// @use '../../node_modules/@material/web/button/outlined-button';
+// @use '../../node_modules/@material/web/checkbox/checkbox';
+// @use '../../node_modules/@material/web/chips/suggestion-chip';
+// @use '../../node_modules/@material/web/field/filled-field';
+// @use '../../node_modules/@material/web/radio/radio';
+// @use '../../node_modules/@material/web/textfield/filled-text-field';
+// @use '../../node_modules/@material/web/textfield/outlined-text-field';
 
 :root {
   --primary: #e38312;
@@ -74,6 +88,10 @@ $background: #fcfcfb;
 html,
 body {
   background-color: $background;
+  font-family: $base-font, $base-font-family;
+  font-weight: $base-font-weight;
+  font-size: $base-font-size;
+  line-height: $base-line-height;
   box-sizing: border-box;
   height: 100%;
   margin: 0; /* Remove default margin */
@@ -81,20 +99,62 @@ body {
   background-color: $background;
 }
 
+h1 {
+  font-weight: $header1-font-weight;
+  text-align: center;
+  font-size: 1.9em;
+  color: #e38312;
+}
+
+h2 {
+  font-weight: $header1-font-weight;
+  text-align: center;
+  font-size: 1.8em;
+  padding: 10px 0 20px 0;
+}
+
+p {
+  margin: 10px 0;
+}
+
 header {
-  display: block;
+  width: 100%;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 99;
   height: 130px;
   background: $tertiary;
   padding: 0px;
+  margin: 0px;
+  background: url("../image/db26368a093c.jpg") center no-repeat #060525;
+  background-size: 60%;
+}
+
+.navigation {
+  width: 100%;
+  position: fixed;
+  top: 130px;
+  left: 0px;
+  z-index: 99;
+  // height: 130px;
+  background: $navigation;
+  padding: 10px;
   margin: 0px;
 }
 
 .content-wrapper {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  // background: $primary;
-  height: calc(100% - 150px);
-  width:100%;
+  min-height: calc(100% - 0px);
+  width: 100%;
+  padding: 210px 0 20px 0;
+  box-sizing: border-box;
+}
+
+.content {
+  width: 800px;
 }
 
 footer {
@@ -103,30 +163,134 @@ footer {
   background: $error;
 }
 
-// // Input Text Fields
-// .input-text-field {
-//     @include mdc-text-field;
-//   }
+button {
+  width: fit-content;
+  height: fit-content;
+  padding: 10px 30px;
+  background: $primary;
+  border-color: $primary;
+  border-width: 2px;
+  border-style: solid;
+  color: rgb(255, 255, 255);
+  border-radius: 25px;
+  // margin: 10px;
+  font-size: 1.00em;
+  text-align: center;
+  cursor: pointer;
 
-//   // Radio Buttons
-//   .radio-button {
-//     @include mdc-radio;
-//   }
+  &.internal{
+    border-radius: 3px;
+    margin:0px;
+    padding: 7px;
+    font-size: 0.9em;
+    margin-top: -4px;
+  }
 
-//   // Text Areas
-//   .text-area {
-//     @include mdc-textarea;
-//   }
+  &:disabled {
+    background: $disabled;
+    border-color: $disabled;
+    color: $disabled-font;
+  }
 
-  // Checkboxes
-//   .checkbox {
-//     @include mdc-checkbox;
-//   }
+  &:hover {
+    opacity: 0.8;
+  }
 
-//   // Tables
-//   .table {
-//     @include mdc-table;
-//   }
+}
+
+input[type=text], input[type=number], textarea{
+  height: fit-content;
+  border-color: $primary;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px 10px;
+  margin: 0px;
+  margin-top: -4px;
+  width: 100%; //calc(100% - 55px);
+  box-sizing: border-box;
+}
+
+label {
+  padding: 5px 10px;
+  font-size: 0.9em;
+}
+
+#pricesContainer{
+  button{
+    margin: 5px 0 5px 6px;
+    display:inline-block;
+  }
+
+  input[type=text] {
+    width: calc(100% - 95px);
+    display: inline-block;
+  }
+}
+
+.row {
+  width: 100%;
+  padding: 0px 0;
+  box-sizing: border-box;
+  padding: 5px 0;
+
+  .column{
+    display:inline-block;
+    vertical-align: top;
+
+    label {
+      padding-top:25px;
+    }
+  }
+
+  .column-4-4 {
+    width: 25%;
+  }
+  .column-3-4 {
+    width: 50%;
+  }
+  .column-2-4 {
+    width: 75%;
+  }
+
+  .column-3-3 {
+    width: 33.2%;
+  }
+  .column-2-3 {
+    width: 66.2%;
+
+  }
+  .column-1 {
+    width: 100%;
+  }
+
+  &.center {
+    text-align: center;
+  }
+
+  &.highlight{
+    padding: 10px;
+    background-color: #e6dfd8;
+    border-radius: 3px;
+  }
+}
+
+.validation-output {
+  background: $erros-background;
+  border-radius: 3px;
+  padding:10px;
+  position:relative;
+  // height: 25px;
+  // height: 25px;
+  width:800px;
+  color: $error;
+  font-size: 0.8em;
+  font-weight: $bold;
+  box-sizing: border-box;
+}
 
 .raffle-data {
   display: flex;
@@ -159,4 +323,136 @@ footer {
     color: grey;
     text-decoration: line-through;
   }
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Light.eot");
+  src: url("fonts/HindSiliguri-Light.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Light.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Light.woff") format("woff"),
+    url("fonts/HindSiliguri-Light.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Light.svg#HindSiliguri-Light") format("svg");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Bold.eot");
+  src: url("fonts/HindSiliguri-Bold.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Bold.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Bold.woff") format("woff"),
+    url("fonts/HindSiliguri-Bold.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Bold.svg#HindSiliguri-Bold") format("svg");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Medium.eot");
+  src: url("fonts/HindSiliguri-Medium.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Medium.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Medium.woff") format("woff"),
+    url("fonts/HindSiliguri-Medium.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Medium.svg#HindSiliguri-Medium") format("svg");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-SemiBold.eot");
+  src: url("fonts/HindSiliguri-SemiBold.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-SemiBold.woff2") format("woff2"),
+    url("fonts/HindSiliguri-SemiBold.woff") format("woff"),
+    url("fonts/HindSiliguri-SemiBold.ttf") format("truetype"),
+    url("fonts/HindSiliguri-SemiBold.svg#HindSiliguri-SemiBold") format("svg");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Regular.eot");
+  src: url("fonts/HindSiliguri-Regular.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Regular.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Regular.woff") format("woff"),
+    url("fonts/HindSiliguri-Regular.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Regular.svg#HindSiliguri-Regular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-SemiBold_1.eot");
+  src: url("fonts/HindSiliguri-SemiBold_1.eot?#iefix")
+      format("embedded-opentype"),
+    url("fonts/HindSiliguri-SemiBold_1.woff2") format("woff2"),
+    url("fonts/HindSiliguri-SemiBold_1.woff") format("woff"),
+    url("fonts/HindSiliguri-SemiBold_1.ttf") format("truetype"),
+    url("fonts/HindSiliguri-SemiBold_1.svg#HindSiliguri-SemiBold") format("svg");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Medium_1.eot");
+  src: url("fonts/HindSiliguri-Medium_1.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Medium_1.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Medium_1.woff") format("woff"),
+    url("fonts/HindSiliguri-Medium_1.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Medium_1.svg#HindSiliguri-Medium") format("svg");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Light_1.eot");
+  src: url("fonts/HindSiliguri-Light_1.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Light_1.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Light_1.woff") format("woff"),
+    url("fonts/HindSiliguri-Light_1.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Light_1.svg#HindSiliguri-Light") format("svg");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Bold_1.eot");
+  src: url("fonts/HindSiliguri-Bold_1.eot?#iefix") format("embedded-opentype"),
+    url("fonts/HindSiliguri-Bold_1.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Bold_1.woff") format("woff"),
+    url("fonts/HindSiliguri-Bold_1.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Bold_1.svg#HindSiliguri-Bold") format("svg");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hind Siliguri";
+  src: url("fonts/HindSiliguri-Regular_1.eot");
+  src: url("fonts/HindSiliguri-Regular_1.eot?#iefix")
+      format("embedded-opentype"),
+    url("fonts/HindSiliguri-Regular_1.woff2") format("woff2"),
+    url("fonts/HindSiliguri-Regular_1.woff") format("woff"),
+    url("fonts/HindSiliguri-Regular_1.ttf") format("truetype"),
+    url("fonts/HindSiliguri-Regular_1.svg#HindSiliguri-Regular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }

@@ -36,19 +36,19 @@ import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
 
-import '@material/web/button/filled-button';
-import '@material/web/button/outlined-button';
-import '@material/web/checkbox/checkbox';
-import '@material/web/chips/suggestion-chip';
-import '@material/web/field/filled-field';
-import '@material/web/radio/radio';
-import '@material/web/textfield/filled-text-field';
-import '@material/web/textfield/outlined-text-field';
+// import '@material/web/button/filled-button';
+// import '@material/web/button/outlined-button';
+// import '@material/web/checkbox/checkbox';
+// import '@material/web/chips/suggestion-chip';
+// import '@material/web/field/filled-field';
+// import '@material/web/radio/radio';
+// import '@material/web/textfield/filled-text-field';
+// import '@material/web/textfield/outlined-text-field';
 
 import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
-
+    console.log('Started');
     // Input elements
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
     const numberOfWinnersInput = document.getElementById('numberOfWinners') as HTMLInputElement;
@@ -62,6 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
     const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
     const determinationTypeRadios = document.querySelectorAll<HTMLInputElement>('input[name="determinationType"]');
+    const useTestDataCheckbox = document.getElementById('useTestData') as HTMLInputElement;
 
     // Output / summary elements
     const validationOutput = document.getElementById('validation-output') as HTMLElement;
@@ -120,22 +121,63 @@ document.addEventListener("DOMContentLoaded", () => {
         addPriceButton.addEventListener('click', function () {
             const input = document.createElement('input');
             input.type = 'text';
-            input.name = `price${priceCount++}`; // Increment counter for each new price input field
-            input.placeholder = 'Price';
+            input.name = `price${priceCount}`; // Increment counter for each new price input field
+            input.placeholder = `${priceCount}. Preis`;
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.name = 'price_remove';
-            removeButton.textContent = 'Remove';
+            removeButton.className = 'internal';
+            removeButton.textContent = 'Entfernen';
             removeButton.addEventListener('click', function () {
                 // Remove the input field and the remove button
                 pricesContainer.removeChild(input);
                 pricesContainer.removeChild(removeButton);
+                priceCount--;
+
+                const priceInputs = document.querySelectorAll('input[name^="price"]');
+                let i = 1;
+                priceInputs.forEach(input => {
+                    (input as HTMLInputElement).placeholder = `${i}. Preis`;
+                    (input as HTMLInputElement).name = `price${i}`;
+                    i++;
+                });
+
             });
 
             pricesContainer.appendChild(input);
             pricesContainer.appendChild(removeButton);
-            pricesContainer.appendChild(document.createElement('br'));
+            priceCount++;
+        });
+
+        useTestDataCheckbox.addEventListener('change', (event) => {
+            let csvString: string;
+
+            if(useTestDataCheckbox.checked){
+
+                csvString = 
+`Name;Email;SequencerTalk Supporter;isActive;haNewsletter
+Sophia Müller;user1@example.de;Sinus;ja;nein
+Lukas Schmidt;user2@example.de-;;nein;ja
+Emma Wagner;user3@example.de-;;nein;ja
+Leon Fischer;user4@example.de;Sinus;ja;nein
+Hannah Weber;user5@example.de;Sinus;ja;nein
+Maximilian Becker;user6@example.de;Sinus;ja;nein
+Mia Schneider;user7@example.de-;;nein;ja
+Elias Richter;user8@example.de;Sinus;ja;nein
+Emilia Keller;user9@example.de;Sinus;ja;nein
+Jonas Meier;user10@example.de;Sinus;ja;nein
+Laura Schäfer;user11@example.de---;Sinus;;nein;
+Lars Klingbeil;user12@example.de---;;nein;nein;
+Susanne Herzensangelegenheit;user13@example.de---;;nein;nein;
+Wanda Alhandra;user14@example.de-;;nein;ja`;
+
+                csvText.value = csvString;
+
+            }else{
+                csvText.value = "";
+            }
+
         });
 
         // Eventlistener for create raffle, output summary and fill the state
@@ -158,24 +200,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 validationText += "Du musst einen Raffle-Namen angeben.<br>";
             }
 
-            if (csvText.value === "") { // TODO !==
+            if (csvText.value !== "") {
 
                 // import participants
-                csvString = `Name;Email;SequencerTalk Supporter;Active;Newsletter
-                Sophia Müller;user1@example.de;Sinus;ja;nein
-                Lukas Schmidt;user2@example.de-;;nein;ja
-                Emma Wagner;user3@example.de-;;nein;ja
-                Leon Fischer;user4@example.de;Sinus;ja;nein
-                Hannah Weber;user5@example.de;Sinus;ja;nein
-                Maximilian Becker;user6@example.de;Sinus;ja;nein
-                Mia Schneider;user7@example.de-;;nein;ja
-                Elias Richter;user8@example.de;Sinus;ja;nein
-                Emilia Keller;user9@example.de;Sinus;ja;nein
-                Jonas Meier;user10@example.de;Sinus;ja;nein
-                Laura Schäfer;user11@example.de---;Sinus;;nein;
-                Lars Klingbeil;user12@example.de---;;nein;nein;
-                Susanne Herzensangelegenheit;user13@example.de---;;nein;nein;
-                Wanda Alhandra;user14@example.de-;;nein;ja`;
+                csvString = csvText.value;
 
                 // Example usage:
                 //const csvString = `John,Doe,john@example.com\nJane,Smith,jane@example.com`;

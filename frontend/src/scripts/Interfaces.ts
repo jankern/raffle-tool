@@ -30,6 +30,6 @@ export interface RaffleState {
     participants: Participant[];
     prices: Price[];
     winners: Winner[];
-    view: string; // create / summary / perform
+    view: string; // info // create / summary / perform
     determinationType: string; // simultaneously / consecutively
 }

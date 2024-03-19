@@ -48,16 +48,23 @@ import { Raffle } from "./Raffle";
 import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log('Started');
     // Input elements
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
     const numberOfWinnersInput = document.getElementById('numberOfWinners') as HTMLInputElement;
     const pricesRadio = document.getElementById('pricesRadio') as HTMLInputElement;
     const addPriceButton = document.getElementById('addPriceButton') as HTMLButtonElement;
     const pricesContainer = document.getElementById('pricesContainer') as HTMLDivElement;
-    const raffleCreate = document.getElementById('raffleCreate') as HTMLButtonElement;
-    const rafflePerform = document.getElementById('rafflePerform') as HTMLButtonElement;
-    const raffleRepeat = document.getElementById('raffleRepeat') as HTMLButtonElement;
+
+    const raffleInfo = document.getElementById('raffle-info') as HTMLButtonElement;
+    const raffleCreate = document.getElementById('raffle-create') as HTMLButtonElement;
+    const raffleCreateReset = document.getElementById('raffle-create-reset') as HTMLButtonElement;
+    const raffleSummary = document.getElementById('raffle-summary') as HTMLButtonElement;
+    const raffleGoTo = document.getElementById('raffle-goto') as HTMLButtonElement;
+    const rafflePerform = document.getElementById('raffle-perform') as HTMLButtonElement;
+    const raffleRepeat = document.getElementById('raffle-repeat') as HTMLButtonElement;
+    const raffleDeterminationType = document.getElementById('raffle-determination-type') as HTMLButtonElement;
+    const raffleWinnerHeadline = document.getElementById('raffle-winner-headline')as HTMLElement;
+
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
     const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
@@ -75,8 +82,92 @@ document.addEventListener("DOMContentLoaded", () => {
     let consecutivelyIterator: number = 0;
     let winnersReverseWithPrice: Winner[] = [];
 
+    raffleInfo.style.display = "inline-block"; // TODO move to a function
+    raffleCreate.style.display = "none";
+    raffleCreateReset.style.display = "none";
+    raffleSummary.style.display = "none";
+    raffleGoTo.style.display = "none";
+    rafflePerform.style.display = "none";
+    raffleRepeat.style.display = "none";
+    raffleDeterminationType.style.display = "none";
+
     // Form input and submit logic and validation
     if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform && determinationTypeRadios) {
+
+        // View: Info
+        raffleInfo.addEventListener('click', function () {
+
+            raffleInfo.style.display = "none";
+            raffleCreate.style.display = "inline-block";
+            raffleCreateReset.style.display = "none";
+            raffleSummary.style.display = "none";
+            raffleGoTo.style.display = "none";
+            rafflePerform.style.display = "none";
+            raffleRepeat.style.display = "none";
+            raffleDeterminationType.style.display = "none";
+            
+            raffleStateContainer.setState({view: "create"});
+            orderContentLayer('create'); // TODO use state value
+        });
+
+         // View: Raffle reset / edit
+         raffleCreateReset.addEventListener('click', function () {
+
+            raffleInfo.style.display = "none";
+            raffleCreate.style.display = "inline-block";
+            raffleCreateReset.style.display = "none";
+            raffleSummary.style.display = "none";
+            raffleGoTo.style.display = "none";
+            rafflePerform.style.display = "none";
+            raffleRepeat.style.display = "none";
+            raffleDeterminationType.style.display = "none";
+            
+            raffleStateContainer.setState({view: "create"});
+            orderContentLayer('create');
+        });
+
+        raffleSummary.addEventListener('click', function () {
+
+            raffleStateContainer.setState({ view: 'summary'});
+
+            raffleInfo.style.display = "none";
+            raffleCreate.style.display = "none";
+            raffleCreateReset.style.display = "inline-block";
+            raffleSummary.style.display = "none";
+            raffleGoTo.style.display = "inline-block";
+            rafflePerform.style.display = "none";
+            raffleRepeat.style.display = "none";
+            raffleDeterminationType.style.display = "none";
+            orderContentLayer('summary');
+
+            //raffleStateContainer.setState({view: "raffle"});
+        });
+
+        // View: Raffle Go To
+        raffleGoTo.addEventListener('click', function () {
+
+            // raffleStateContainer.setState({ view: 'raffle', winners: [] });
+            raffleStateContainer.setState({ view: 'raffle'});
+            //winnerOutput.innerHTML = "";
+            consecutivelyIterator = 0;
+
+            raffleInfo.style.display = "none";
+            raffleCreate.style.display = "none";
+            raffleCreateReset.style.display = "none";
+            raffleSummary.style.display = "inline-block";
+            raffleGoTo.style.display = "none";
+            rafflePerform.style.display = "inline-block";
+            raffleRepeat.style.display = "none";
+            raffleDeterminationType.style.display = "inline-block";
+            orderContentLayer('raffle');
+
+            if(raffleStateContainer.getState().winners.length > 0 ){
+                rafflePerform.style.display = "none";
+                raffleRepeat.style.display = "inline-block";
+            }
+
+            //raffleStateContainer.setState({view: "raffle"});
+        });
 
         // Eventmethod for winner number
         function numberOfWinnersRadioChange() {
@@ -153,10 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
         useTestDataCheckbox.addEventListener('change', (event) => {
             let csvString: string;
 
-            if(useTestDataCheckbox.checked){
+            if (useTestDataCheckbox.checked) {
 
-                csvString = 
-`Name;Email;SequencerTalk Supporter;isActive;haNewsletter
+                csvString =
+                    `Name;Email;SequencerTalk Supporter;isActive;haNewsletter
 Sophia Müller;user1@example.de;Sinus;ja;nein
 Lukas Schmidt;user2@example.de-;;nein;ja
 Emma Wagner;user3@example.de-;;nein;ja
@@ -174,14 +265,13 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
 
                 csvText.value = csvString;
 
-            }else{
+            } else {
                 csvText.value = "";
             }
 
         });
 
-        // Eventlistener for create raffle, output summary and fill the state
-        raffleCreate.addEventListener('click', function (event) {
+        function raffleCreateEvent(event: any) {
 
             // prevent form from general submit
             event.preventDefault();
@@ -274,6 +364,7 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
             if (validationText === "") {
 
                 validationOutput.innerHTML = "";
+                validationOutput.style.display = 'none';
 
                 // Fill state methods with list data for prices
                 raffleStateContainer.createPrices(priceItems);
@@ -292,14 +383,28 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
+                
+
+                raffleInfo.style.display = "none";
+                raffleCreate.style.display = "none";
+                raffleCreateReset.style.display = "inline-block";
+                raffleGoTo.style.display = "inline-block";
+                rafflePerform.style.display = "none";
+                raffleRepeat.style.display = "none";
+
                 // set veiw state
                 raffleStateContainer.setState({ view: "summary" });
+                orderContentLayer('summary');
 
             } else {
                 validationOutput.innerHTML = validationText;
+                validationOutput.style.display = 'block';
             }
 
-        });
+        }
+
+        // Eventlistener for create raffle, output summary and fill the state
+        raffleCreate.addEventListener('click', raffleCreateEvent);
 
         determinationTypeRadios.forEach(radio => {
             radio.addEventListener('change', function (event) {
@@ -318,8 +423,8 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
             if (raffleStateContainer.getState().winners.length <= 0) {
                 raffleStateContainer.addWinners(raffle.pickWinners());
                 updateParticipantListAndPrices();
-                console.log('Winners picked');
-                console.log(raffleStateContainer.getState());
+                // console.log('Winners picked');
+                // console.log(raffleStateContainer.getState());
             }
 
             // Reverse array and add price if needed
@@ -335,11 +440,22 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
                             priceText = "<br>" + price.priceText;
                         }
                     }
-                    return `<div class="info-box">${winner.id} ${winner.name}${priceText}</div>`;
+                    return `<div class="info-box winner">${winner.id}. <b>${winner.name}</b><br>${priceText}</div>`; 
                 }).join('');
+
+                rafflePerform.textContent = "Raffle";
+
+                raffleInfo.style.display = "none";
+                raffleSummary.style.display = "inline-block";
+                raffleCreateReset.style.display = "none";
+                raffleGoTo.style.display = "none";
+                rafflePerform.style.display = "none";
+                raffleRepeat.style.display = "inline-block";
+
+                raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
+
             } else {
                 // Print winners consecutively
-                console.log('in consecutively');
                 if (consecutivelyIterator < reversedWinners.length) {
                     const winner = reversedWinners[consecutivelyIterator];
                     let priceText = "";
@@ -350,20 +466,61 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
                         }
                     }
                     let el = document.createElement("div");
-                    el.className = "info-box";
+                    el.className = "info-box winner";
                     winnerOutput.prepend(el);
-                    el.innerHTML = `${winner.id} ${winner.name}${priceText}`;
+                    el.innerHTML = `${winner.id}. <b>${winner.name}</b><br>${priceText}`;
                     consecutivelyIterator++;
+
+                    raffleSummary.style.display = "none";
+                    raffleCreateReset.style.display = "none";
+
+                    rafflePerform.textContent = "Raffle ("+consecutivelyIterator+"/"+reversedWinners.length+")";
+              
+                    if(consecutivelyIterator === reversedWinners.length){
+
+                        // raffleCreateReset.style.display = "inline-block";
+                        rafflePerform.style.display = "none";
+                        raffleSummary.style.display = "inline-block";
+                        raffleRepeat.style.display = "inline-block"
+                    }
+                    raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
+                    
                 } else {
+                    
+                    // raffleInfo.style.display = "none";
+                    // raffleCreate.style.display = "non";
+                    // raffleCreateReset.style.display = "inline-block";
+                    // raffleGoTo.style.display = "none";
+                    // rafflePerform.style.display = "none";
+                    // raffleRepeat.style.display = "inline-block";
                     //consecutivelyIterator = 0; // Reset iterator if reached the end of the array
                 }
             }
+
         });
 
         raffleRepeat.addEventListener('click', function (event) {
-            raffleStateContainer.setState({ winners: [] });
+
+            // Output summary
+            const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
+            renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal); 
+
+            rafflePerform.textContent = "Raffle";
+            raffleStateContainer.setState({ view: 'raffle', winners: [] });
             winnerOutput.innerHTML = "";
             consecutivelyIterator = 0;
+
+            raffleInfo.style.display = "none";
+            raffleCreate.style.display = "none";
+            raffleCreateReset.style.display = "none";
+            raffleSummary.style.display = "nline-block";
+            raffleGoTo.style.display = "none";
+            rafflePerform.style.display = "inline-block";
+            raffleRepeat.style.display = "none";
+
+            raffleWinnerHeadline.textContent = "Raffle GO!!!"
+
+            //raffleStateContainer.setState({view: "raffle"});
         });
 
         // Call radio selection for winner at page load
@@ -374,9 +531,9 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
     function renderRaffleData(prices: Price[], numberOfWinners: (number | null | undefined), hasNewsletter: boolean): number {
 
         let numberOfWinnersTotal: number = 0;
-        hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: V";
+        hasNewsletterOutput.innerHTML = "Supporter: <b>ja</b> <br>Newsletter: <b>ja</b>";
         if (!hasNewsletter) {
-            hasNewsletterOutput.innerHTML = "Supporter: V <br>Newsletter: X";
+            hasNewsletterOutput.innerHTML = "Supporter: <b>ja</b> <br>Newsletter: <b>-</b>";
         }
 
         if (numberOfWinners && numberOfWinners > 0) {
@@ -387,7 +544,7 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
             numberOfWinnersTotal = prices.length;
         }
 
-        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: " + numberOfWinnersTotal;
+        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: <b>" + numberOfWinnersTotal +"</b>";
 
         if (prices.length > 0) {
             pricesOutput.innerHTML = `Diese Preise werden an die Gewinner verteilt:`;
@@ -407,7 +564,7 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
     // Function to render the participant list on the HTML page
     function renderParticipantList(participants: Participant[], numberOfWinnersTotal: number) {
 
-        participantsOutput.innerHTML = `Die ${numberOfWinnersTotal} Gewinner werden aus folgender Liste ermittelt:<br>`;
+        participantsOutput.innerHTML = `Die <b>${numberOfWinnersTotal}</b> Gewinner werden aus folgender Liste ermittelt:<br>`;
         let table = `<table id="participantTable"><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th>`;
 
         participants.forEach(participant => {
@@ -456,7 +613,7 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
                         const pricesListItems = document.querySelectorAll('#prices-output li');
                         pricesListItems.forEach(item => {
                             if (winner.priceId === +item.id) {
-                                item.innerHTML += " - " + winner.name;
+                                item.innerHTML += " - <b>" + winner.name + "</b>";
                             }
                         });
                     }
@@ -499,6 +656,21 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
         return true;
     }
 
+    function orderContentLayer(state: string): void{
+        const contentLayers = document.querySelectorAll<HTMLInputElement>('.content-wrapper');
+        let i = 1;
+        contentLayers.forEach(content => {
+            if(content.id !== state){
+                content.style.zIndex = `${i}`;
+                content.style.display = "none";
+                i++;
+            }else{
+                content.style.zIndex = '4';
+                content.style.display = "flex";
+            }
+        });
+    }
+
     // Define initial state
     const initialState: RaffleState = {
         name: "New Raffle",
@@ -507,7 +679,7 @@ Wanda Alhandra;user14@example.de-;;nein;ja`;
         participants: [],
         prices: [],
         winners: [],
-        view: "create",
+        view: "info",
         determinationType: "simultaneously"
     };
 

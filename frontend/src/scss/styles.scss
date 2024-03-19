@@ -2,6 +2,7 @@
 // Prim/Sec/Tert/Err - #E38312 #031136 #082CE2 #EC265B
 
 $primary: #e38312;
+$primary-light: #e6ba87;
 $secondary: #031136;
 $tertiary: #082ce2;
 $error: #ec265b;
@@ -10,6 +11,8 @@ $background: #fcfcfb;
 $disabled: #998c7d;
 $disabled-font: #e6dfd8;
 $navigation: #e6e4e2;
+$winner: rgb(96, 192, 96);
+$row: #e6dfd8;
 
 // Font weights
 $light: 300;
@@ -117,6 +120,19 @@ p {
   margin: 10px 0;
 }
 
+a{
+  text-decoration: none;
+  color: $primary;
+
+  &:hover{
+    opacity: 0.8;
+  }
+}
+
+form.raffle-determination-type {
+  display:inline-block;
+}
+
 header {
   width: 100%;
   position: fixed;
@@ -134,23 +150,26 @@ header {
 .navigation {
   width: 100%;
   position: fixed;
+  box-sizing: border-box;
   top: 130px;
   left: 0px;
   z-index: 99;
-  // height: 130px;
+  text-align: right;
   background: $navigation;
   padding: 10px;
   margin: 0px;
 }
 
 .content-wrapper {
+  position:absolute;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  min-height: calc(100% - 0px);
+  min-height: calc(100% - 20px);
   width: 100%;
-  padding: 210px 0 20px 0;
+  padding: 210px 0 50px 0;
   box-sizing: border-box;
+  background: $background;
 }
 
 .content {
@@ -196,6 +215,11 @@ button {
     opacity: 0.8;
   }
 
+  &#raffle-perform {
+    background: $secondary;
+    border-color: $secondary;
+  }
+
 }
 
 input[type=text], input[type=number], textarea{
@@ -226,7 +250,7 @@ label {
   }
 
   input[type=text] {
-    width: calc(100% - 95px);
+    width: calc(100% - 96px);
     display: inline-block;
   }
 }
@@ -236,6 +260,7 @@ label {
   padding: 0px 0;
   box-sizing: border-box;
   padding: 5px 0;
+  margin: 10px 0;
 
   .column{
     display:inline-block;
@@ -283,44 +308,83 @@ label {
   border-radius: 3px;
   padding:10px;
   position:relative;
-  // height: 25px;
-  // height: 25px;
+  display:none;
   width:800px;
   color: $error;
   font-size: 0.8em;
   font-weight: $bold;
   box-sizing: border-box;
+  display: none;
 }
 
 .raffle-data {
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
-  width: 50%;
+  justify-content: center;
+  width: 100%; 
 
   div.info-box {
-    background: lightblue;
     padding: 10px;
     width: 50%;
     box-sizing: border-box;
 
+    &.left {
+      background: $row;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+      border-right: solid 1px white;
+    }
+
+    &.right {
+      background: $row;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
     &.block {
-      background: lightgreen;
+      box-sizing: border-box;
       width: 100%;
     }
+
+    table {
+      width: 100%;
+      background-color: $row;
+    }
+
+    tr, td, th{
+      border: solid 0px;
+      text-align: left;
+    }
+
+    th{
+      font-size: 0.8em;
+    }
+
+    &.winner {
+      background: $primary;
+      padding:20px;
+      border-radius: 3px;
+      color: white;
+      width: calc(50% - 5px);
+      margin: 5px 5px 0px 0;
+      min-height: 150px;
+    }
+
   }
 }
 
 #participants-output {
   .winner {
-    background: green;
+    background: $winner;
   }
 }
 
 .excluded-from-raffle {
-  background: red;
+  background: $error;
   td,
   th {
-    color: grey;
+    // color: $tertiary;
     text-decoration: line-through;
   }
 }

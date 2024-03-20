@@ -247,21 +247,17 @@ document.addEventListener("DOMContentLoaded", () => {
             if (useTestDataCheckbox.checked) {
 
                 csvString =
-                    `Name;Email;SequencerTalk Supporter;isActive;haNewsletter
-Sophia Müller;user1@example.de;Sinus;ja;nein
-Lukas Schmidt;user2@example.de-;;nein;ja
-Emma Wagner;user3@example.de-;;nein;ja
-Leon Fischer;user4@example.de;Sinus;ja;nein
-Hannah Weber;user5@example.de;Sinus;ja;nein
-Maximilian Becker;user6@example.de;Sinus;ja;nein
-Mia Schneider;user7@example.de-;;nein;ja
-Elias Richter;user8@example.de;Sinus;ja;nein
-Emilia Keller;user9@example.de;Sinus;ja;nein
-Jonas Meier;user10@example.de;Sinus;ja;nein
-Laura Schäfer;user11@example.de---;Sinus;;nein;
-Lars Klingbeil;user12@example.de---;;nein;nein;
-Susanne Herzensangelegenheit;user13@example.de---;;nein;nein;
-Wanda Alhandra;user14@example.de-;;nein;ja`;
+                    `first_name;last_name;email;plan_name;plan_monthly_amount_cents;gifted;subscription_period;subscription_state;subscribed_at;trial_ends_at;cancelled_at;expires_at;shipping_first_name;shipping_last_name;shipping_company_name;shipping_street_and_number;shipping_city;shipping_zip_code;shipping_state;shipping_country_code;new_plan_name;new_plan_monthly_amount_cents;price_increase_opt_in_email_sent_at;price_increase_opted_in_at;price_increase_new_plan_monthly_amount_cents
+Sophia;Müller;mail-1@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Lukas;Schmidt;mail-2@example.de;SequencerTalk Supporter (Level: Sägezahn);600;FALSE;monthly;cancelled;16.12.22;;28.02.23;28.02.23;;;;;;;;;;;;;
+Hans;Dampf;mail-3@example.de;SequencerTalk Supporter (Level: Sägezahn);600;FALSE;monthly;not_renewing;16.12.22;;28.02.23;28.02.23;;;;;;;;;;;;;
+Ben;Hartmann;mail-4@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Felix;Hoffmann;mail-5@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Laura ;Schäfer;mail-6@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Luca ;Lange;mail-7@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Elena ;Wagner;mail-8@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Paul ;Schulz;mail-9@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;
+Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FALSE;annual;active;21.02.23;;;;;;;;;;;;;;21.08.23;30.08.23;`;
 
                 csvText.value = csvString;
 

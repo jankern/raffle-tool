@@ -423,7 +423,7 @@ mail-29@example.de;2024-03-20 08:43:10.035321Z`;
                 raffleCreateReset.style.display = "inline-block";
                 raffleGoTo.style.display = "inline-block";
                 rafflePerform.style.display = "none";
-                raffleRepeat.style.display = "none";
+                raffleRepeat.style.display = "none"; 
 
                 // set veiw state
                 raffleStateContainer.setState({ view: "summary" });

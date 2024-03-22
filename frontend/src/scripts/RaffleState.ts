@@ -28,7 +28,7 @@ export class RaffleStateContainer {
 
         for (let i = 0; i < rows.length; i++) { // Start from index 1 to skip header row
             const row = rows[i];
-            const columns = row.split(';').map(item => item.trim());
+            const columns = row.split(/[,;]/).map(item => item.trim());
 
             // First title row 
             if (i <= 0) {

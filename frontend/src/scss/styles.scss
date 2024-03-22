@@ -11,6 +11,7 @@ $background: #fcfcfb;
 $disabled: #998c7d;
 $disabled-font: #e6dfd8;
 $navigation: #e6e4e2;
+$navigation-light:#edeae7;
 $winner: rgb(96, 192, 96);
 $row: #e6dfd8;
 
@@ -139,7 +140,7 @@ header {
   top: 0px;
   left: 0px;
   z-index: 99;
-  height: 130px;
+  height: 110px;
   background: $tertiary;
   padding: 0px;
   margin: 0px;
@@ -151,7 +152,7 @@ header {
   width: 100%;
   position: fixed;
   box-sizing: border-box;
-  top: 130px;
+  top: 110px;
   left: 0px;
   z-index: 99;
   text-align: right;
@@ -167,7 +168,7 @@ header {
   justify-content: center;
   min-height: calc(100% - 20px);
   width: 100%;
-  padding: 210px 0 50px 0;
+  padding: 190px 0 50px 0;
   box-sizing: border-box;
   background: $background;
 }
@@ -177,9 +178,17 @@ header {
 }
 
 footer {
-  display: block;
-  height: 20px;
-  background: $error;
+  position: fixed;
+  bottom: 0px;
+  z-index: 999;
+  // height: 20px;
+  width: 100%;
+  text-align: right;
+  font-size: 0.7em;
+  padding:1px 15px;
+  color: $disabled;
+  box-sizing: border-box;
+  background: $navigation-light;
 }
 
 button {

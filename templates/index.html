@@ -9,7 +9,6 @@
   <body>
     <header class="header"></header>
     <div class="navigation">
-      
       <form class="raffle-determination-type" id="raffle-determination-type">
         <input
           type="radio"
@@ -26,9 +25,6 @@
           value="consecutively"
         />
         <label for="consecutively">Nacheinander</label>
-
-        <!-- <button type="button" id="rafflePerform">Go Raffle</button>
-          <button type="button" id="raffleRepeat">Di it again</button> -->
       </form>
       <button type="button" id="raffle-perform" class="nav">Raffle</button>
       <button type="button" id="raffle-repeat" class="nav">Nochmal</button>
@@ -63,8 +59,15 @@
           Stammdaten (aus Steady) im CSV-Textformat importiert werden.
         </p>
         <p>
-          <b>TODO</b>: Das tatsächliche Format und die Felder müssen noch
-          festgelegt werden.
+          <i
+            >Solange es noch kein File-Drop gibt, die CSV-Datei im Texteditor
+            öffnen z.B. mit 'textEdit', den Inhalt kopieren und dann in die
+            jeweilige Textbox für Supporter und Newsletter einfügen.</i
+          >
+        </p>
+        <p>
+          <b>TODO</b>: Die Importanpassungen für Supporter und Newsletter aus getrennten 
+          CSV-Dateien ist gemacht, müsste jetzt von dir mal getestet werden.
         </p>
         <p>
           Beim Eingabefeld kann zu Testzwecken ein Testimport angeklickt
@@ -78,8 +81,7 @@
           Steady-Messages oder im sequencer.de-Forum (#jancore).
         </p>
 
-        <div class="row center">
-        </div>
+        <div class="row center"></div>
       </div>
     </div>
 
@@ -101,10 +103,21 @@
           <div class="row highlight">
             <div class="row">
               <div class="column column-1">
-                <label for="csvText">Teilnehmerimport (CSV-Text):</label>
+                <label for="csvText">Supporter-Import (CSV-Text):</label>
                 <textarea
                   id="csvText"
                   name="csvText"
+                  rows="4"
+                  cols="50"
+                ></textarea>
+              </div>
+              <!-- </div>
+            <div class="row"> -->
+              <div class="column column-1">
+                <label for="csvText">Newsletter-Import (CSV-Text):</label>
+                <textarea
+                  id="csvNewsletterText"
+                  name="csvNewsletterText"
                   rows="4"
                   cols="50"
                 ></textarea>
@@ -117,7 +130,7 @@
               </div>
             </div>
           </div>
-          <div class="row">
+          <!-- <div class="row">
             <div class="column column-3-3">
               <input
                 type="checkbox"
@@ -136,7 +149,7 @@
               />
               <label for="includeNewsletter">Mit Newsletter-Abonnenten</label>
             </div>
-          </div>
+          </div> -->
           <div class="row">
             <div class="column column-3-3">
               <input
@@ -181,6 +194,7 @@
 
     <div class="content-wrapper" style="z-index: 2" id="summary">
       <div class="content">
+        <h1>Summary</h1>
         <div class="raffle-data" id="raffle-data">
           <div class="info-box left" id="has-newletter-output"></div>
           <div class="info-box right" id="number-of-winners-output"></div>
@@ -193,8 +207,7 @@
     <div class="content-wrapper" style="z-index: 1" id="raffle">
       <div class="content">
         <h1 id="raffle-winner-headline">Raffle GO!!!</h1>
-        <div class="raffle-data" id="winner-output">
-        </div>
+        <div class="raffle-data" id="winner-output"></div>
       </div>
     </div>
     <footer></footer>

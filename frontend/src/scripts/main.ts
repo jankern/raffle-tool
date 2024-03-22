@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const addPriceButton = document.getElementById('addPriceButton') as HTMLButtonElement;
     const pricesContainer = document.getElementById('pricesContainer') as HTMLDivElement;
 
+    // Buttond
     const raffleInfo = document.getElementById('raffle-info') as HTMLButtonElement;
     const raffleCreate = document.getElementById('raffle-create') as HTMLButtonElement;
     const raffleCreateReset = document.getElementById('raffle-create-reset') as HTMLButtonElement;
@@ -63,11 +64,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const rafflePerform = document.getElementById('raffle-perform') as HTMLButtonElement;
     const raffleRepeat = document.getElementById('raffle-repeat') as HTMLButtonElement;
     const raffleDeterminationType = document.getElementById('raffle-determination-type') as HTMLButtonElement;
-    const raffleWinnerHeadline = document.getElementById('raffle-winner-headline')as HTMLElement;
+    const raffleWinnerHeadline = document.getElementById('raffle-winner-headline') as HTMLElement;
 
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
+    const csvNewsletterText = document.getElementById('csvNewsletterText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
-    const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement;
+    //const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement; // TODO
     const determinationTypeRadios = document.querySelectorAll<HTMLInputElement>('input[name="determinationType"]');
     const useTestDataCheckbox = document.getElementById('useTestData') as HTMLInputElement;
 
@@ -105,13 +107,13 @@ document.addEventListener("DOMContentLoaded", () => {
             rafflePerform.style.display = "none";
             raffleRepeat.style.display = "none";
             raffleDeterminationType.style.display = "none";
-            
-            raffleStateContainer.setState({view: "create"});
+
+            raffleStateContainer.setState({ view: "create" });
             orderContentLayer('create'); // TODO use state value
         });
 
-         // View: Raffle reset / edit
-         raffleCreateReset.addEventListener('click', function () {
+        // View: Raffle reset / edit
+        raffleCreateReset.addEventListener('click', function () {
 
             raffleInfo.style.display = "none";
             raffleCreate.style.display = "inline-block";
@@ -121,14 +123,14 @@ document.addEventListener("DOMContentLoaded", () => {
             rafflePerform.style.display = "none";
             raffleRepeat.style.display = "none";
             raffleDeterminationType.style.display = "none";
-            
-            raffleStateContainer.setState({view: "create"});
+
+            raffleStateContainer.setState({ view: "create" });
             orderContentLayer('create');
         });
 
         raffleSummary.addEventListener('click', function () {
 
-            raffleStateContainer.setState({ view: 'summary'});
+            raffleStateContainer.setState({ view: 'summary' });
 
             raffleInfo.style.display = "none";
             raffleCreate.style.display = "none";
@@ -147,7 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         raffleGoTo.addEventListener('click', function () {
 
             // raffleStateContainer.setState({ view: 'raffle', winners: [] });
-            raffleStateContainer.setState({ view: 'raffle'});
+            raffleStateContainer.setState({ view: 'raffle' });
             //winnerOutput.innerHTML = "";
             consecutivelyIterator = 0;
 
@@ -161,7 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
             raffleDeterminationType.style.display = "inline-block";
             orderContentLayer('raffle');
 
-            if(raffleStateContainer.getState().winners.length > 0 ){
+            if (raffleStateContainer.getState().winners.length > 0) {
                 rafflePerform.style.display = "none";
                 raffleRepeat.style.display = "inline-block";
             }
@@ -243,6 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         useTestDataCheckbox.addEventListener('change', (event) => {
             let csvString: string;
+            let csvNewsletterString: string;
 
             if (useTestDataCheckbox.checked) {
 
@@ -261,8 +264,23 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
 
                 csvText.value = csvString;
 
+                csvNewsletterString = `email;opted_in_at
+mail-20@example.de;2024-03-20 08:43:10.035321Z
+mail-21@example.de;2024-03-20 08:43:10.035321Z
+mail-22@example.de;2024-03-20 08:43:10.035321Z
+mail-23@example.de;2024-03-20 08:43:10.035321Z
+mail-24@example.de;2024-03-20 08:43:10.035321Z
+mail-25@example.de;2024-03-20 08:43:10.035321Z
+mail-26@example.de;2024-03-20 08:43:10.035321Z
+mail-27@example.de;2024-03-20 08:43:10.035321Z
+mail-28@example.de;2024-03-20 08:43:10.035321Z
+mail-29@example.de;2024-03-20 08:43:10.035321Z`;
+
+                csvNewsletterText.value = csvNewsletterString;
+
             } else {
                 csvText.value = "";
+                csvNewsletterText.value = "";
             }
 
         });
@@ -277,6 +295,7 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
             let numberOfWinners: number = 0;
             let priceItems: string[] = [];
             let csvString: string = "";
+            let csvNewsletterString: string = "";
             let participantEntries: string[] = [];
 
             // Form validations
@@ -291,24 +310,43 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                 // import participants
                 csvString = csvText.value;
 
-                // Example usage:
-                //const csvString = `John,Doe,john@example.com\nJane,Smith,jane@example.com`;
                 if (validateCSV(csvString)) {
                     // Proceed with importing the CSV string
-                    raffleStateContainer.importCSV(csvString);
+                    console.log('import Supporter CSV');
+                    raffleStateContainer.importCSV(csvString, true);
                 } else {
                     // Handle invalid CSV string
                     validationText += "Das CSV-Format ist nicht korrekt.<br>";
                 }
 
-                // Validieren
-                participantEntries = csvString.split('\n');
+            }
 
-                // Fill state methods with list data for participant and prices
-                raffleStateContainer.importCSV(csvString);
+            if (csvNewsletterText.value !== "") {
 
+                // import participants
+                csvNewsletterString = csvNewsletterText.value;
+
+                let isParticipantsReset: boolean = csvText.value === "" ? true : false;
+
+                if (validateCSV(csvNewsletterString)) {
+                    // Proceed with importing the CSV string
+                    console.log('import Newsletter CSV');
+                    raffleStateContainer.importCSV(csvNewsletterString, isParticipantsReset);
+                } else {
+                    // Handle invalid CSV string
+                    validationText += "Das CSV-Format ist nicht korrekt.<br>";
+                }
+
+            }
+
+            if (csvNewsletterText.value === "" && csvText.value === "") {
+                validationText += "Du musst CSV-Text in eines der Textfelder kopieren.<br>";
             } else {
-                validationText += "Du musst CSV-Text in das Textfeld kopieren.<br>";
+                // Check for duplicats
+                const uniqueParticipants = raffleStateContainer.removeDuplicates(raffleStateContainer.getState().participants);
+                raffleStateContainer.setState({ participants: uniqueParticipants });
+                console.log('Teilnehmer nach Leerung doppelter Emailadressen:');
+                console.log(uniqueParticipants)
             }
 
             let i = 0;
@@ -319,10 +357,9 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                     participantLengthWithSupporterOrNewsletter += 1;
                 }
 
-                if (includeNewsletterCheckbox.checked) {
-                    if (raffleStateContainer.getState().participants[i].hasNewsletter) {
-                        participantLengthWithSupporterOrNewsletter += 1;
-                    }
+                // Check if newsletter participants are available
+                if (raffleStateContainer.getState().participants[i].hasNewsletter) {
+                    participantLengthWithSupporterOrNewsletter += 1;
                 }
                 i += 1;
             }
@@ -368,18 +405,18 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                 // Fill state with simple variables
                 const state = {
                     name: raffleName,
-                    includeNewsletterParticipants: includeNewsletterCheckbox.checked,
+                    includeNewsletterParticipants: csvNewsletterText.value !== "" ? true : false, //includeNewsletterCheckbox.checked,
                     numberOfWinners: numberOfWinners
                 };
 
                 // Set state object
                 raffleStateContainer.setState(state);
 
+                console.log('Start rendering list data');
+                console.log(raffleStateContainer.getState().participants);
                 // Output summary
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
-
-                
 
                 raffleInfo.style.display = "none";
                 raffleCreate.style.display = "none";
@@ -436,7 +473,8 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                             priceText = "<br>" + price.priceText;
                         }
                     }
-                    return `<div class="info-box winner">${winner.id}. <b>${winner.name}</b><br>${priceText}</div>`; 
+                    const winnerName: string = winner.name === "" || winner.name === " " ? winner.email : winner.name;
+                    return `<div class="info-box winner"><div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}</div>`;
                 }).join('');
 
                 rafflePerform.textContent = "Raffle";
@@ -464,15 +502,16 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                     let el = document.createElement("div");
                     el.className = "info-box winner";
                     winnerOutput.prepend(el);
-                    el.innerHTML = `${winner.id}. <b>${winner.name}</b><br>${priceText}`;
+                    const winnerName: string = winner.name === "" || winner.name === " " ? winner.email : winner.name;
+                    el.innerHTML = `<div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}`;
                     consecutivelyIterator++;
 
                     raffleSummary.style.display = "none";
                     raffleCreateReset.style.display = "none";
 
-                    rafflePerform.textContent = "Raffle ("+consecutivelyIterator+"/"+reversedWinners.length+")";
-              
-                    if(consecutivelyIterator === reversedWinners.length){
+                    rafflePerform.textContent = "Raffle (" + consecutivelyIterator + "/" + reversedWinners.length + ")";
+
+                    if (consecutivelyIterator === reversedWinners.length) {
 
                         // raffleCreateReset.style.display = "inline-block";
                         rafflePerform.style.display = "none";
@@ -480,9 +519,9 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                         raffleRepeat.style.display = "inline-block"
                     }
                     raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
-                    
+
                 } else {
-                    
+
                     // raffleInfo.style.display = "none";
                     // raffleCreate.style.display = "non";
                     // raffleCreateReset.style.display = "inline-block";
@@ -499,7 +538,7 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
 
             // Output summary
             const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
-            renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal); 
+            renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
             rafflePerform.textContent = "Raffle";
             raffleStateContainer.setState({ view: 'raffle', winners: [] });
@@ -527,9 +566,15 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
     function renderRaffleData(prices: Price[], numberOfWinners: (number | null | undefined), hasNewsletter: boolean): number {
 
         let numberOfWinnersTotal: number = 0;
-        hasNewsletterOutput.innerHTML = "Supporter: <b>ja</b> <br>Newsletter: <b>ja</b>";
-        if (!hasNewsletter) {
+
+        const hasSupporter: boolean = csvText.value !== "" ? true : false;
+
+        if (hasSupporter && !hasNewsletter) {
             hasNewsletterOutput.innerHTML = "Supporter: <b>ja</b> <br>Newsletter: <b>-</b>";
+        } else if (!hasSupporter && hasNewsletter) {
+            hasNewsletterOutput.innerHTML = "Supporter: <b>-</b> <br>Newsletter: <b>ja</b>";
+        } else {
+            hasNewsletterOutput.innerHTML = "Supporter: <b>ja</b> <br>Newsletter: <b>ja</b>";
         }
 
         if (numberOfWinners && numberOfWinners > 0) {
@@ -540,16 +585,16 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
             numberOfWinnersTotal = prices.length;
         }
 
-        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: <b>" + numberOfWinnersTotal +"</b>";
+        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: <b>" + numberOfWinnersTotal + "</b>";
 
         if (prices.length > 0) {
             pricesOutput.innerHTML = `Diese Preise werden an die Gewinner verteilt:`;
-            let li = "<ul>";
+            let table = '<table class="prices-and-winner"><tr><th>Preise</th><th>Gewinner</th>';
             prices.forEach(element => {
-                li += "<li id=" + element.id + ">" + element.priceText + "</li>";
+                table += `<tr><td>${element.priceText}</td><td id="${element.id}"></td></tr>`;
             });
-            li += "</ul>";
-            pricesOutput.innerHTML += li;
+            table += "</table>";
+            pricesOutput.innerHTML += table;
         } else {
             pricesOutput.innerHTML = `Es sind keine gesonderten Preise definiert. Es werden nur Gewinner bestimmt.`;
         }
@@ -560,7 +605,7 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
     // Function to render the participant list on the HTML page
     function renderParticipantList(participants: Participant[], numberOfWinnersTotal: number) {
 
-        participantsOutput.innerHTML = `Die <b>${numberOfWinnersTotal}</b> Gewinner werden aus folgender Liste ermittelt:<br>`;
+        participantsOutput.innerHTML = `Die <b>${numberOfWinnersTotal}</b> Gewinner werden aus folgender Liste (${raffleStateContainer.getState().participants.length}) ermittelt:<br>`;
         let table = `<table id="participantTable"><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th>`;
 
         participants.forEach(participant => {
@@ -571,7 +616,8 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                 willbePrinted = true;
             }
 
-            if (includeNewsletterCheckbox.checked) {
+            // if (includeNewsletterCheckbox.checked) {
+            if (csvNewsletterText.value !== "") {
                 if (participant.hasNewsletter) {
                     willbePrinted = true;
                 }
@@ -582,7 +628,7 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                 className = "";
             }
 
-            let row = `<td>${participant.name}</td><td>${participant.email}</td><td>${participant.supporterType}</td><td>${participant.isActive}</td><td>${participant.hasNewsletter}</td>`;
+            let row = `<td>${participant.firstName} ${participant.lastName}</td><td>${participant.email}</td><td>${participant.supporterType}</td><td>${participant.isActive}</td><td>${participant.hasNewsletter}</td>`;
             table += `<tr class="${className}" id="${participant.id}">${row}</tr>`;
         });
 
@@ -606,10 +652,11 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
                     });
 
                     if (raffleStateContainer.getState().prices.length > 0) {
-                        const pricesListItems = document.querySelectorAll('#prices-output li');
+                        const pricesListItems = document.querySelectorAll('#prices-output td');
                         pricesListItems.forEach(item => {
                             if (winner.priceId === +item.id) {
-                                item.innerHTML += " - <b>" + winner.name + "</b>";
+                                const winnerName: string = winner.name === "" || winner.name === " " ? winner.email : winner.name;
+                                item.innerHTML += " <b>" + winnerName + "</b>";
                             }
                         });
                     }
@@ -628,9 +675,10 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
         prices: Price[];
         winners: Winner[];
     }) {
-        if (raffleNameInput && includeNewsletterCheckbox && numberOfWinnersInput) {
+        // if (raffleNameInput && includeNewsletterCheckbox && numberOfWinnersInput) { // TODO
+        if (raffleNameInput && numberOfWinnersInput) { // TODO
             raffleNameInput.value = state.name;
-            includeNewsletterCheckbox.checked = state.includeNewsletterParticipants;
+            //includeNewsletterCheckbox.checked = state.includeNewsletterParticipants;
             numberOfWinnersInput.value = state.numberOfWinners ? state.numberOfWinners.toString() : '';
         }
     }
@@ -652,15 +700,15 @@ Timo ;Günther;mail-10@example.de;SequencerTalk Supporter (Level: Sinus);300;FAL
         return true;
     }
 
-    function orderContentLayer(state: string): void{
+    function orderContentLayer(state: string): void {
         const contentLayers = document.querySelectorAll<HTMLInputElement>('.content-wrapper');
         let i = 1;
         contentLayers.forEach(content => {
-            if(content.id !== state){
+            if (content.id !== state) {
                 content.style.zIndex = `${i}`;
                 content.style.display = "none";
                 i++;
-            }else{
+            } else {
                 content.style.zIndex = '4';
                 content.style.display = "flex";
             }

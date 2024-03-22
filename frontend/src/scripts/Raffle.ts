@@ -43,7 +43,7 @@ export class Raffle {
 
                         let winner: Winner = {
                             id: winners.length + 1,
-                            name: participants[randomIndex].name,
+                            name: participants[randomIndex].firstName+" "+participants[randomIndex].lastName,
                             email: participants[randomIndex].email,
                             isSupporter: participants[randomIndex].isActive,
                             participantId: participants[randomIndex].id,

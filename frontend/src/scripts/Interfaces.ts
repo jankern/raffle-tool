@@ -1,8 +1,9 @@
 export interface Participant {
     id: number;
-    name: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
-    supporterType: string | null;
+    supporterType?: string | null;
     isActive: boolean;
     hasNewsletter: boolean;
 }

@@ -17,8 +17,13 @@ export class RaffleStateContainer {
     }
 
     importCSV(csvText: string, isParticipantsReset: boolean) {
+        // Remove empty lines
+        const nonEmptyLines = csvText.split('\n').filter(line => line.trim() !== '');
+        const nonEmptyCSVText = nonEmptyLines.join('\n')
+
         // Parse CSV text
-        const rows = csvText.split('\n');
+        const rows = nonEmptyCSVText.split('\n');
+        // const rows = csvText.split('\n');
         const participants: Participant[] = [];
         let fileInputType: string = "supporter";
 
@@ -39,6 +44,8 @@ export class RaffleStateContainer {
 
             } else {
 
+                
+
                 if (fileInputType === "supporter") {
                     console.log('in Supporter');
                     // Extract required columns
@@ -49,6 +56,8 @@ export class RaffleStateContainer {
                     const subscriptionStateIndex: number = 7; //columns.findIndex((col, index) => index >= 4 && col === 'subscription_state');
                     // Add the index of subscription_state
                     const subscriptionState: string = subscriptionStateIndex !== -1 ? columns[subscriptionStateIndex] : '';
+
+                    console.log('in row '+i+" "+email);
 
                     if (subscriptionState !== "" && email !== "") {
                         const isActive = subscriptionState.toLowerCase() === 'active' ? true : false;

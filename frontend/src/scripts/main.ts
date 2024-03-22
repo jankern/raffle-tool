@@ -345,29 +345,16 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 // Check for duplicats
                 const uniqueParticipants = raffleStateContainer.removeDuplicates(raffleStateContainer.getState().participants);
                 raffleStateContainer.setState({ participants: uniqueParticipants });
-                console.log('Teilnehmer nach Leerung doppelter Emailadressen:');
+                console.log('Participants after removing duplicated email ids:');
                 console.log(uniqueParticipants)
             }
 
-            let i = 0;
-            let participantLengthWithSupporterOrNewsletter = 0;
-            while (i < raffleStateContainer.getState().participants.length) {
 
-                if (raffleStateContainer.getState().participants[i].isActive) {
-                    participantLengthWithSupporterOrNewsletter += 1;
-                }
-
-                // Check if newsletter participants are available
-                if (raffleStateContainer.getState().participants[i].hasNewsletter) {
-                    participantLengthWithSupporterOrNewsletter += 1;
-                }
-                i += 1;
-            }
-
+            console.log('winner amount check');
             if (numberOfWinnersRadio.checked) {
                 if (numberOfWinnersInput.value !== "" && +numberOfWinnersInput.value > 0) {
                     numberOfWinners = +numberOfWinnersInput.value;
-                    if (participantLengthWithSupporterOrNewsletter < numberOfWinners) {
+                    if (raffleStateContainer.getState().participants.length < numberOfWinners) {
                         validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren.<br>";
                     }
                 } else {
@@ -388,7 +375,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     validationText += "Du musst mindestens einen Preis angeben<br>";
                 }
 
-                if (participantLengthWithSupporterOrNewsletter < priceItems.length) {
+                if (raffleStateContainer.getState().participants.length < priceItems.length) {
                     validationText += "Du kannst nicht mehr Preise als Teilnehmer definieren.<br>";
                 }
             }

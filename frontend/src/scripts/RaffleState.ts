@@ -44,8 +44,6 @@ export class RaffleStateContainer {
 
             } else {
 
-                
-
                 if (fileInputType === "supporter") {
                     console.log('in Supporter');
                     // Extract required columns

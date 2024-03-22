@@ -349,12 +349,20 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 console.log(uniqueParticipants)
             }
 
+            let inactiveParticipants = 0;
+            for(let i = 0; i < raffleStateContainer.getState().participants.length; i++){
+                if(raffleStateContainer.getState().participants[i].supporterType !== "" && !raffleStateContainer.getState().participants[i].isActive){
+                    inactiveParticipants++;
+                }
+            }
+
+            console.log('inactiveParticipants', inactiveParticipants);
 
             console.log('winner amount check');
             if (numberOfWinnersRadio.checked) {
                 if (numberOfWinnersInput.value !== "" && +numberOfWinnersInput.value > 0) {
                     numberOfWinners = +numberOfWinnersInput.value;
-                    if (raffleStateContainer.getState().participants.length < numberOfWinners) {
+                    if (raffleStateContainer.getState().participants.length-inactiveParticipants < numberOfWinners) {
                         validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren.<br>";
                     }
                 } else {
@@ -375,7 +383,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     validationText += "Du musst mindestens einen Preis angeben<br>";
                 }
 
-                if (raffleStateContainer.getState().participants.length < priceItems.length) {
+                if (raffleStateContainer.getState().participants.length-inactiveParticipants < priceItems.length) {
                     validationText += "Du kannst nicht mehr Preise als Teilnehmer definieren.<br>";
                 }
             }

@@ -69,7 +69,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const csvNewsletterText = document.getElementById('csvNewsletterText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
-    //const includeNewsletterCheckbox = document.getElementById('includeNewsletter') as HTMLInputElement; // TODO
     const determinationTypeRadios = document.querySelectorAll<HTMLInputElement>('input[name="determinationType"]');
     const useTestDataCheckbox = document.getElementById('useTestData') as HTMLInputElement;
 
@@ -82,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const winnerOutput = document.getElementById('winner-output') as HTMLElement;
 
     let consecutivelyIterator: number = 0;
-    let winnersReverseWithPrice: Winner[] = [];
 
     raffleInfo.style.display = "inline-block"; // TODO move to a function
     raffleCreate.style.display = "none";
@@ -468,7 +466,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                             priceText = "<br>" + price.priceText;
                         }
                     }
-                    const winnerName: string = winner.name === "" || winner.name === " " ? winner.email : winner.name;
+                    const winnerName: string = winner.name === "" || winner.name === " " ? raffle.shortenEmailUsername(winner.email, 70) : raffle.shortenName(winner.name);
                     return `<div class="info-box winner"><div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}</div>`;
                 }).join('');
 
@@ -497,7 +495,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     let el = document.createElement("div");
                     el.className = "info-box winner";
                     winnerOutput.prepend(el);
-                    const winnerName: string = winner.name === "" || winner.name === " " ? winner.email : winner.name;
+                    const winnerName: string = winner.name === "" || winner.name === " " ? raffle.shortenEmailUsername(winner.email, 70) : raffle.shortenName(winner.name);
                     el.innerHTML = `<div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}`;
                     consecutivelyIterator++;
 

@@ -30,8 +30,8 @@ export class RaffleStateContainer {
         // Reset number of participant iteration when starting the raffle
         if (isParticipantsReset) {
             this.participantAmount = 1;
-            this.setState({numberOfSupporterParticipants: 0});
-            this.setState({numberOfNewsletterParticipants: 0});
+            this.setState({ numberOfSupporterParticipants: 0 });
+            this.setState({ numberOfNewsletterParticipants: 0 });
         }
 
         for (let i = 0; i < rows.length; i++) { // Start from index 1 to skip header row
@@ -107,7 +107,7 @@ export class RaffleStateContainer {
 
     }
 
-    createPrices(priceInputs: {priceText: string, priceType: string}[]): void { 
+    createPrices(priceInputs: { priceText: string, priceType: string }[]): void {
 
         const prices: Price[] = [];
 
@@ -129,35 +129,40 @@ export class RaffleStateContainer {
         const seenEmails = new Set<string>(); // Set to track seen email addresses
 
         // Keep supporter and newsletter counter up to date
-        this.setState({numberOfSupporterParticipants: 0});
-        this.setState({numberOfNewsletterParticipants: 0});
+        this.setState({ numberOfSupporterParticipants: 0 });
+        this.setState({ numberOfNewsletterParticipants: 0 });
 
         let newId = 1;
         for (const participant of participants) {
 
             if (!seenEmails.has(participant.email)) {
                 // Add email to set
+                // TODO Nesletter emails will not be checked, assuming we get now duplicates, ok?
                 if (participant.isActive && participant.supporterType !== "") {
                     seenEmails.add(participant.email);
-
                 }
                 participant.id = newId++;
                 // Add participant to unique list
                 uniqueParticipants.push(participant);
 
-                if(participant.isActive && participant.supporterType !== ""){
-                    // Increase supporter participant counter
-                    let numberOfSupporterParticipants: number | undefined = this.getState().numberOfSupporterParticipants;
-                    if (numberOfSupporterParticipants !== undefined && numberOfSupporterParticipants !== null) {
-                        numberOfSupporterParticipants++;
-                        this.setState({ numberOfSupporterParticipants });
-                    }
-                }else{
-                    // Increase newsletter participant counter
-                    let numberOfNewsletterParticipants: number | undefined = this.getState().numberOfNewsletterParticipants;
-                    if (numberOfNewsletterParticipants !== undefined && numberOfNewsletterParticipants !== null) {
-                        numberOfNewsletterParticipants++;
-                        this.setState({ numberOfNewsletterParticipants });
+                // Regexp for str
+                const hasContentRegExp = /\S/;
+
+                if (participant.firstName !== undefined) {
+                    if (hasContentRegExp.test(participant.firstName)) {
+                        // Increase supporter participant counter
+                        let numberOfSupporterParticipants: number | undefined = this.getState().numberOfSupporterParticipants;
+                        if (numberOfSupporterParticipants !== undefined && numberOfSupporterParticipants !== null) {
+                            numberOfSupporterParticipants++;
+                            this.setState({ numberOfSupporterParticipants });
+                        }
+                    } else {
+                        // Increase newsletter participant counter
+                        let numberOfNewsletterParticipants: number | undefined = this.getState().numberOfNewsletterParticipants;
+                        if (numberOfNewsletterParticipants !== undefined && numberOfNewsletterParticipants !== null) {
+                            numberOfNewsletterParticipants++;
+                            this.setState({ numberOfNewsletterParticipants });
+                        }
                     }
                 }
             }

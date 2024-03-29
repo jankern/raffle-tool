@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const allOption = document.createElement('option');
             allOption.value = 'all';
-            allOption.text = 'All';
+            allOption.text = 'Alle';
 
             select.appendChild(supporterOption);
             select.appendChild(newsletterOption);
@@ -310,7 +310,9 @@ mail-25@example.de,2024-03-20 08:43:10.035321Z
 mail-26@example.de,2024-03-20 08:43:10.035321Z
 mail-27@example.de,2024-03-20 08:43:10.035321Z
 mail-28@example.de,2024-03-20 08:43:10.035321Z
+mail-28@example.de,2024-03-20 08:43:10.035321Z
 mail-29@example.de,2024-03-20 08:43:10.035321Z`;
+
 
                 csvNewsletterText.value = csvNewsletterString;
 
@@ -407,26 +409,44 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 const state = raffleStateContainer.getState();
 
                 if (numberOfSupporterWinnersInput.value !== "" && +numberOfSupporterWinnersInput.value > 0) {
-                    
+
                     if (state && state.numberOfSupporterParticipants !== undefined) {
-                        if (state.numberOfSupporterParticipants < +numberOfSupporterWinnersInput.value) {
-                            validationText += "Du musst eine gültige Gewinneranzahl von Supportern eingeben (max. "+state.numberOfSupporterParticipants+").<br>";
+                        if (state.numberOfSupporterParticipants - inactiveParticipants < +numberOfSupporterWinnersInput.value) {
+                            validationText += "Du musst eine gültige Gewinneranzahl von Supportern eingeben (max. " + (state.numberOfSupporterParticipants - inactiveParticipants) + ").<br>";
+                        } else {
+                            numberOfSupporterWinners = +numberOfSupporterWinnersInput.value;
                         }
-                    }else{
-                        numberOfSupporterWinners = +numberOfSupporterWinnersInput.value;
                     }
-                } 
+
+                } else {
+                    if (csvText.value !== "") {
+                        validationText += "Du musst eine Gewinneranzahl von Supportern eingeben.<br>";
+                    }
+                }
 
                 if (numberOfNewsletterWinnersInput.value !== "" && +numberOfNewsletterWinnersInput.value > 0) {
-                    
+
                     if (state && state.numberOfNewsletterParticipants !== undefined) {
                         if (state.numberOfNewsletterParticipants < +numberOfNewsletterWinnersInput.value) {
-                            validationText += "Du musst eine gültige Gewinneranzahl von Newsletter-Abonnenten eingeben (max. "+state.numberOfNewsletterParticipants+").<br>";
+                            validationText += "Du musst eine gültige Gewinneranzahl von Newsletter-Abonnenten eingeben (max. " + state.numberOfNewsletterParticipants + ").<br>";
+                        } else {
+                            numberOfNewsletterWinners = +numberOfNewsletterWinnersInput.value;
                         }
-                    }else{
-                        numberOfNewsletterWinners = +numberOfNewsletterWinnersInput.value;
                     }
-                } 
+                } else {
+                    if (csvNewsletterText.value !== "") {
+                        validationText += "Du musst eine Gewinneranzahl von Newsletter-Abonnenten eingeben.<br>";
+                    }
+                }
+
+                // Check if the overall participant list length matches 
+                if (state && state.numberOfSupporterParticipants !== undefined && state && state.numberOfNewsletterParticipants !== undefined) {
+                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < ((+numberOfSupporterWinnersInput.value)+(+numberOfSupporterWinnersInput.value))) {
+                        validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren (max. " + (raffleStateContainer.getState().participants.length - inactiveParticipants) + ").<br>";
+                    }
+                }
+
+                numberOfWinners = numberOfSupporterWinners + numberOfNewsletterWinners;
 
             }
 
@@ -436,16 +456,39 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 let htmlName: string;
                 let priceText: string;
                 let priceType: string;
+                let numberOfSupporterSelect: number = 0;
+                let numberOfNewsletterSelect: number = 0;
+                let hasSupporterInputFailed = false;
+                let hasNewsletterInputFailed = false;
 
-                // Collect priceText and priceType from html input / select elements and pass them to 
+                // Collect priceText and priceType from html input / select elements and pass them to the priceItems array
                 priceInputs.forEach(input => {
 
                     if ((input as HTMLInputElement).value !== "") {
 
                         if (htmlName === (input as HTMLInputElement).name) {
                             priceType = (input as HTMLInputElement).value;
-                            console.log(priceText + ' ' + priceType);
-                            // priceItems.push((input as HTMLInputElement).value);
+
+                            // Regexp for str
+                            const hasContentRegExp = /\S/;
+
+                            // Check if no priceType is selected for supporter or newsletter when they are empty
+                            if (!hasContentRegExp.test(csvText.value) && priceType === "supporter") {
+                                hasSupporterInputFailed = true;
+                            }
+
+                            if (!hasContentRegExp.test(csvNewsletterText.value) && priceType === "newsletter") {
+                                hasNewsletterInputFailed = true;
+                            }
+
+                            if (priceType === "supporter") {
+                                numberOfSupporterSelect++;
+                            }
+
+                            if (priceType === "newsletter") {
+                                numberOfNewsletterSelect++;
+                            }
+
                             priceItems.push({ priceText, priceType });
                         } else {
                             priceText = (input as HTMLInputElement).value;
@@ -456,12 +499,38 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
                 });
 
+
                 if (priceItems.length <= 0) {
                     validationText += "Du musst mindestens einen Preis angeben<br>";
                 }
 
-                if (raffleStateContainer.getState().participants.length - inactiveParticipants < priceItems.length) {
-                    validationText += "Du kannst nicht mehr Preise als Teilnehmer definieren.<br>";
+                if (hasSupporterInputFailed) {
+                    validationText += "Es sind keine Supporter vorhanden zur Preiszuordnung.<br>";
+                }
+
+                if (hasNewsletterInputFailed) {
+                    validationText += "Es sind keine Newsletter-Abonnenten vorhanden zur Preiszuordnung.<br>";
+                }
+
+                // Check if less / equal supporters or newsletters are targeted via priceType
+                let state = raffleStateContainer.getState();
+                if (state && state.numberOfSupporterParticipants !== undefined) {
+                    if (state.numberOfSupporterParticipants > 0 && state.numberOfSupporterParticipants  - inactiveParticipants < numberOfSupporterSelect) {
+                        validationText += "Du musst eine gültige Preisanzahl von Supportern definieren (max. " + (state.numberOfSupporterParticipants - inactiveParticipants) + ").<br>";
+                    }
+                }
+
+                if (state && state.numberOfNewsletterParticipants !== undefined) {
+                    if (state.numberOfNewsletterParticipants > 0 && state.numberOfNewsletterParticipants < numberOfNewsletterSelect) {
+                        validationText += "Du musst eine gültige Preisanzahl von Newsletter-Abonnenten definieren (max. " + state.numberOfNewsletterParticipants + ").<br>";
+                    }
+                }
+
+                // Check if the overall participant list length matches 
+                if (state && state.numberOfSupporterParticipants !== undefined && state && state.numberOfNewsletterParticipants !== undefined) {
+                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < priceItems.length) {
+                        validationText += "Du kannst nicht mehr Preise als Teilnehmer definieren (max. " + (raffleStateContainer.getState().participants.length - inactiveParticipants) + ").<br>";
+                    }
                 }
             }
 
@@ -510,7 +579,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             } else {
                 validationOutput.innerHTML = validationText;
                 validationOutput.style.display = 'block';
-                
+
                 window.scrollTo({
                     top: 0,
                     behavior: 'smooth'
@@ -539,8 +608,6 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             if (raffleStateContainer.getState().winners.length <= 0) {
                 raffleStateContainer.addWinners(raffle.pickWinners());
                 updateParticipantListAndPrices();
-                // console.log('Winners picked');
-                // console.log(raffleStateContainer.getState());
             }
 
             // Reverse array and add price if needed

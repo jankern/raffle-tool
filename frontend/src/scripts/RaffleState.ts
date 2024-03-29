@@ -32,7 +32,6 @@ export class RaffleStateContainer {
             this.participantAmount = 1;
             this.setState({numberOfSupporterParticipants: 0});
             this.setState({numberOfNewsletterParticipants: 0});
-
         }
 
         for (let i = 0; i < rows.length; i++) { // Start from index 1 to skip header row

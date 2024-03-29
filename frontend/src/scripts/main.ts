@@ -1,56 +1,17 @@
 /* 
     Main ts file to handle the raffle project
-    
-    Endpoints for Frontend:
-    /raffles
-    /raffle/<id>
-    /participants
-    /participant/<id>
-    /beneficiaries
-    /beneficiary/<id>
-
-    Endpoints for Backend / REST API:
-    /api/v1/raffles
-    /api/v1/raffle/<id>
-    /api/v1/participants
-    /api/v1/participant/<id>
-    /api/v1/beneficiaries
-    /api/v1/beneficiary/<id>
-    /api/v1/import
 */
-
-/**
- * 
- * Status
- * form and state implemented
- * next: 
- * function to pick winner and update state
- * [v] clear state
- * [v] Output summary
- * integrate material
- * raffle animation ()
- * 
- */
 
 import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
 
-// import '@material/web/button/filled-button';
-// import '@material/web/button/outlined-button';
-// import '@material/web/checkbox/checkbox';
-// import '@material/web/chips/suggestion-chip';
-// import '@material/web/field/filled-field';
-// import '@material/web/radio/radio';
-// import '@material/web/textfield/filled-text-field';
-// import '@material/web/textfield/outlined-text-field';
-
 import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
     // Input elements
+    const headerEl = document.getElementById('header') as HTMLElement;
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
-    //const numberOfWinnersInput = document.getElementById('numberOfWinners') as HTMLInputElement;
     const numberOfSupporterWinnersInput = document.getElementById('numberOfSupporterWinners') as HTMLInputElement;
     const numberOfNewsletterWinnersInput = document.getElementById('numberOfNewsletterWinners') as HTMLInputElement;
     const pricesRadio = document.getElementById('pricesRadio') as HTMLInputElement;
@@ -228,27 +189,27 @@ document.addEventListener("DOMContentLoaded", () => {
             input.type = 'text';
             input.name = `price${priceCount}`; // Increment counter for each new price input field
             input.placeholder = `${priceCount}. Preis`;
-        
+
             const select = document.createElement('select');
             select.name = `priceType${priceCount}`;
             select.name = `price${priceCount}`;
-            
+
             const supporterOption = document.createElement('option');
             supporterOption.value = 'supporter';
             supporterOption.text = 'Supporter';
-        
+
             const newsletterOption = document.createElement('option');
             newsletterOption.value = 'newsletter';
             newsletterOption.text = 'Newsletter';
-        
+
             const allOption = document.createElement('option');
             allOption.value = 'all';
             allOption.text = 'All';
-        
+
             select.appendChild(supporterOption);
             select.appendChild(newsletterOption);
             select.appendChild(allOption);
-        
+
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.name = 'price_remove';
@@ -260,7 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 pricesContainer.removeChild(select);
                 pricesContainer.removeChild(removeButton);
                 priceCount--;
-        
+
                 const priceInputs = document.querySelectorAll('input[name^="price"]');
                 let i = 1;
                 priceInputs.forEach(input => {
@@ -268,21 +229,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     (input as HTMLInputElement).name = `price${i}`;
                     i++;
                 });
-        
+
                 const priceTypeSelects = document.querySelectorAll('select[name^="priceType"]');
                 priceTypeSelects.forEach(select => {
                     (select as HTMLSelectElement).name = `priceType${i}`;
                     i++;
                 });
-        
+
             });
-        
+
             pricesContainer.appendChild(input);
             pricesContainer.appendChild(select);
             pricesContainer.appendChild(removeButton);
             priceCount++;
         });
-        
+
 
         // addPriceButton.addEventListener('click', function () {
         //     const input = document.createElement('input');
@@ -371,7 +332,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             let numberOfSupporterWinners: number = 0;
             let numberOfNewsletterWinners: number = 0;
             // let priceItems: string[] = [];
-            let priceItems: {priceText: string, priceType: string}[] = [];
+            let priceItems: { priceText: string, priceType: string }[] = [];
             let csvString: string = "";
             let csvNewsletterString: string = "";
             let participantEntries: string[] = [];
@@ -417,7 +378,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
             }
 
-            console.log('Number of sup part and newsl part: '+raffleStateContainer.getState().numberOfSupporterParticipants+' '+raffleStateContainer.getState().numberOfNewsletterParticipants);
+            console.log('Number of sup part and newsl part: ' + raffleStateContainer.getState().numberOfSupporterParticipants + ' ' + raffleStateContainer.getState().numberOfNewsletterParticipants);
 
             if (csvNewsletterText.value === "" && csvText.value === "") {
                 validationText += "Du musst CSV-Text in eines der Textfelder kopieren.<br>";
@@ -427,7 +388,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 raffleStateContainer.setState({ participants: uniqueParticipants });
                 console.log('Participants after removing duplicated email ids:');
                 console.log(uniqueParticipants);
-                console.log('Number of sup part and newsl part 2: '+raffleStateContainer.getState().numberOfSupporterParticipants+' '+raffleStateContainer.getState().numberOfNewsletterParticipants);
+                console.log('Number of sup part and newsl part 2: ' + raffleStateContainer.getState().numberOfSupporterParticipants + ' ' + raffleStateContainer.getState().numberOfNewsletterParticipants);
 
             }
 
@@ -439,21 +400,34 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             }
 
             console.log('inactiveParticipants', inactiveParticipants);
-            console.log('winner amount check');
 
+            // Validate if supporter and newsletter are entered nad if they don't exceed the participant amount
             if (numberOfWinnersRadio.checked) {
-                if ((numberOfSupporterWinnersInput.value !== "" && +numberOfSupporterWinnersInput.value > 0)
-                    || (numberOfNewsletterWinnersInput.value !== "" && +numberOfNewsletterWinnersInput.value > 0)) {
-                    numberOfSupporterWinners = +numberOfSupporterWinnersInput.value;
-                    numberOfNewsletterWinners = +numberOfNewsletterWinnersInput.value;
-                    numberOfWinners = numberOfSupporterWinners + numberOfNewsletterWinners;
 
-                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < numberOfWinners) {
-                        validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren.<br>";
+                const state = raffleStateContainer.getState();
+
+                if (numberOfSupporterWinnersInput.value !== "" && +numberOfSupporterWinnersInput.value > 0) {
+                    
+                    if (state && state.numberOfSupporterParticipants !== undefined) {
+                        if (state.numberOfSupporterParticipants < +numberOfSupporterWinnersInput.value) {
+                            validationText += "Du musst eine gültige Gewinneranzahl von Supportern eingeben (max. "+state.numberOfSupporterParticipants+").<br>";
+                        }
+                    }else{
+                        numberOfSupporterWinners = +numberOfSupporterWinnersInput.value;
                     }
-                } else {
-                    validationText += "Du musst eine gültige Gewinneranzahl eingeben.<br>";
-                }
+                } 
+
+                if (numberOfNewsletterWinnersInput.value !== "" && +numberOfNewsletterWinnersInput.value > 0) {
+                    
+                    if (state && state.numberOfNewsletterParticipants !== undefined) {
+                        if (state.numberOfNewsletterParticipants < +numberOfNewsletterWinnersInput.value) {
+                            validationText += "Du musst eine gültige Gewinneranzahl von Newsletter-Abonnenten eingeben (max. "+state.numberOfNewsletterParticipants+").<br>";
+                        }
+                    }else{
+                        numberOfNewsletterWinners = +numberOfNewsletterWinnersInput.value;
+                    }
+                } 
+
             }
 
             if (pricesRadio.checked) {
@@ -465,18 +439,18 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
                 // Collect priceText and priceType from html input / select elements and pass them to 
                 priceInputs.forEach(input => {
-                    
+
                     if ((input as HTMLInputElement).value !== "") {
 
-                        if(htmlName === (input as HTMLInputElement).name){
+                        if (htmlName === (input as HTMLInputElement).name) {
                             priceType = (input as HTMLInputElement).value;
-                            console.log(priceText+' '+priceType);
+                            console.log(priceText + ' ' + priceType);
                             // priceItems.push((input as HTMLInputElement).value);
-                            priceItems.push({priceText, priceType});
-                        }else{
+                            priceItems.push({ priceText, priceType });
+                        } else {
                             priceText = (input as HTMLInputElement).value;
                         }
-                        
+
                         htmlName = (input as HTMLInputElement).name;
                     }
 
@@ -536,6 +510,11 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             } else {
                 validationOutput.innerHTML = validationText;
                 validationOutput.style.display = 'block';
+                
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             }
 
         }

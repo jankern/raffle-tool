@@ -27,8 +27,12 @@ export class RaffleStateContainer {
         const participants: Participant[] = [];
         let fileInputType: string = "supporter";
 
+        // Reset number of participant iteration when starting the raffle
         if (isParticipantsReset) {
             this.participantAmount = 1;
+            this.setState({numberOfSupporterParticipants: 0});
+            this.setState({numberOfNewsletterParticipants: 0});
+
         }
 
         for (let i = 0; i < rows.length; i++) { // Start from index 1 to skip header row
@@ -55,7 +59,7 @@ export class RaffleStateContainer {
                     // Add the index of subscription_state
                     const subscriptionState: string = subscriptionStateIndex !== -1 ? columns[subscriptionStateIndex] : '';
 
-                    console.log('in row '+i+" "+email);
+                    console.log('in row ' + i + " " + email);
 
                     if (subscriptionState !== "" && email !== "") {
                         const isActive = subscriptionState.toLowerCase() === 'active' ? true : false;
@@ -70,6 +74,7 @@ export class RaffleStateContainer {
                     // Create participant object and add it to the list
                     if (email !== "") {
                         participants.push({ id: this.participantAmount, firstName: "", lastName: "", email, supporterType: "", isActive: false, hasNewsletter: true });
+
                     }
                 }
 
@@ -87,7 +92,7 @@ export class RaffleStateContainer {
             // Add new participants to existing list
             this.addParticipants(participants);
         }
-        
+
         console.log(this.getState());
     }
 
@@ -103,13 +108,13 @@ export class RaffleStateContainer {
 
     }
 
-    createPrices(priceInputs: string[]): void {
+    createPrices(priceInputs: {priceText: string, priceType: string}[]): void { 
 
         const prices: Price[] = [];
 
         let i: number = 1;
         for (const row of priceInputs) {
-            prices.push({ id: i, priceText: row });
+            prices.push({ id: i, priceText: row.priceText, priceType: row.priceType });
             i += 1;
         }
 
@@ -124,6 +129,10 @@ export class RaffleStateContainer {
         const uniqueParticipants: Participant[] = [];
         const seenEmails = new Set<string>(); // Set to track seen email addresses
 
+        // Keep supporter and newsletter counter up to date
+        this.setState({numberOfSupporterParticipants: 0});
+        this.setState({numberOfNewsletterParticipants: 0});
+
         let newId = 1;
         for (const participant of participants) {
 
@@ -131,14 +140,30 @@ export class RaffleStateContainer {
                 // Add email to set
                 if (participant.isActive && participant.supporterType !== "") {
                     seenEmails.add(participant.email);
-                    
+
                 }
                 participant.id = newId++;
                 // Add participant to unique list
                 uniqueParticipants.push(participant);
+
+                if(participant.isActive && participant.supporterType !== ""){
+                    // Increase supporter participant counter
+                    let numberOfSupporterParticipants: number | undefined = this.getState().numberOfSupporterParticipants;
+                    if (numberOfSupporterParticipants !== undefined && numberOfSupporterParticipants !== null) {
+                        numberOfSupporterParticipants++;
+                        this.setState({ numberOfSupporterParticipants });
+                    }
+                }else{
+                    // Increase newsletter participant counter
+                    let numberOfNewsletterParticipants: number | undefined = this.getState().numberOfNewsletterParticipants;
+                    if (numberOfNewsletterParticipants !== undefined && numberOfNewsletterParticipants !== null) {
+                        numberOfNewsletterParticipants++;
+                        this.setState({ numberOfNewsletterParticipants });
+                    }
+                }
             }
         }
-        
+
         return uniqueParticipants;
     }
 

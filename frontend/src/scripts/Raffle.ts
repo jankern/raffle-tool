@@ -1,3 +1,4 @@
+import { forEachChild } from 'typescript';
 import { Participant, Price, Winner } from './Interfaces';
 import { RaffleStateContainer } from './RaffleState';
 
@@ -8,64 +9,229 @@ export class Raffle {
         this.stateContainer = stateContainer;
     }
 
-    // Function to pick winners from the participant list and return them
+
     pickWinners(): Winner[] {
-        const participants: Participant[] = this.stateContainer.getState().participants;
-        let numberOfWinners = this.stateContainer.getState().numberOfWinners !== null ?
-            this.stateContainer.getState().numberOfWinners : 0;
-        const prices: Price[] = this.stateContainer.getState().prices;
+        const state = this.stateContainer.getState();
+        const participants: Participant[] = state.participants;
+
+        let numberOfSupporterWinners: number = state.numberOfSupporterWinners !== undefined ? state.numberOfSupporterWinners : 0;
+        let numberOfNewsletterWinners: number = state.numberOfNewsletterWinners !== undefined ? state.numberOfNewsletterWinners : 0;
+
+        const prices: Price[] = state.prices;
 
         const winners: Winner[] = [];
         const selectedIndexes: Set<number> = new Set(); // To keep track of selected participants
 
-        if (prices.length > 0) {
-            numberOfWinners = prices.length;
-        }
+        // Function to pick winners from a specific group of participants 
+        function pickWinnersFromGroup(group: Participant[], numberOfWinners: number, isSupporter: boolean, handleAllIndex: number): number {
 
-        if (numberOfWinners && numberOfWinners >= 0) {
-            if (numberOfWinners <= participants.length) {
+            // filter only support or newsletter participants
+            let eligibleParticipants: Participant[] = [];
 
-                while (winners.length < numberOfWinners) {
-                    const randomIndex = Math.floor(Math.random() * participants.length);
+            eligibleParticipants = group.filter(participant => (isSupporter && participant.isActive && !participant.hasNewsletter) || (!isSupporter && !participant.isActive && participant.hasNewsletter));
 
-                    let isSupporterOrHasNewsletter: boolean = false;
-                    if (participants[randomIndex].isActive) {
-                        isSupporterOrHasNewsletter = true;
+            while (winners.length < numberOfWinners && eligibleParticipants.length > 0) {
+                const randomIndex = Math.floor(Math.random() * eligibleParticipants.length);
+                const winnerIndex = participants.findIndex(participant => participant === eligibleParticipants[randomIndex]);
+                //console.log(winnerIndex);
+
+                const winner: Winner = {
+                    id: winners.length + 1,
+                    name: eligibleParticipants[randomIndex].firstName + " " + eligibleParticipants[randomIndex].lastName,
+                    email: eligibleParticipants[randomIndex].email,
+                    isSupporter: isSupporter,
+                    participantId: eligibleParticipants[randomIndex].id,
+                    priceId: null,
+                    index: winnerIndex // Storing the index of the winner in the original participants array
+                };
+
+                if (prices.length > 0) {
+                    // Find the price type for the current winner
+                    const priceType = prices[winners.length].priceType;
+                    console.log('priceType');
+                    console.log(priceType);
+
+                    // Check if the price type matches the winner's eligibility
+                    if (priceType === 'supporter' && isSupporter) {
+                        winner.priceId = prices[winners.length].id;
+                    } else if (priceType === 'newsletter' && !isSupporter) {
+                        winner.priceId = prices[winners.length].id;
                     }
-
-                    if (this.stateContainer.getState().includeNewsletterParticipants) {
-                        if (participants[randomIndex].hasNewsletter) {
-                            isSupporterOrHasNewsletter = true;
-                        }
-                    }
-
-                    if (!selectedIndexes.has(randomIndex) && isSupporterOrHasNewsletter) {
-
-                        let winner: Winner = {
-                            id: winners.length + 1,
-                            name: participants[randomIndex].firstName + " " + participants[randomIndex].lastName,
-                            email: participants[randomIndex].email,
-                            isSupporter: participants[randomIndex].isActive,
-                            participantId: participants[randomIndex].id,
-                            priceId: null,
-                            index: randomIndex // Storing the index of the winner in the original participants array
-                        }
-
-                        if (prices.length > 0) {
-                            winner.priceId = prices[winners.length].id;
-                        }
-
-                        winners.push(winner);
-                        selectedIndexes.add(randomIndex);
+                    else if (priceType === 'all') {
+                        winner.priceId = prices[winners.length].id;
                     }
                 }
-            } else {
-                // Handle case where numberOfWinners is greater than the number of participants
-                console.error("Number of winners exceeds the number of participants.");
+
+                winners.push(winner);
+                selectedIndexes.add(winnerIndex);
+                // Remove winner from eligible participants to prevent duplicate winners
+                eligibleParticipants.splice(randomIndex, 1);
             }
+
+            return winners.length;
         }
+
+
+        // Pick supporter winners
+        let supporterWinner: number = 0;
+        let newsletterWinner: number = 0;
+
+        // check if more prices are defined as supporter oder newsletter participants, if so, short it to that  
+        let handleAllIndex: number = -1;
+        if (prices.length > 0) {
+            let i: number = 0;
+            prices.forEach(price => {
+                if (price.priceType === "supporter") {
+                    numberOfSupporterWinners++;
+                } else if (price.priceType === "all") {
+                    handleAllIndex = i;
+                } else {
+                    numberOfNewsletterWinners++;
+                }
+                i++;
+            });
+        }
+
+        // check if more numberOfSupporterWinners / numberOfNewsletterWinners are defined as supporter oder newsletter participants, if so, short it to that
+        if (state.numberOfSupporterParticipants !== undefined && state.numberOfSupporterParticipants < numberOfSupporterWinners) {
+            numberOfSupporterWinners = state.numberOfSupporterParticipants;
+        }
+
+        if (state.numberOfNewsletterParticipants !== undefined && state.numberOfNewsletterParticipants < numberOfNewsletterWinners) {
+            numberOfNewsletterWinners = state.numberOfNewsletterParticipants;
+        }
+
+        // Call pickWinnersFromGroup for Supporter
+        supporterWinner = pickWinnersFromGroup(participants, numberOfSupporterWinners + newsletterWinner, true, handleAllIndex);
+
+        // Call pickWinnersFromGroup for Newsletter
+        newsletterWinner = pickWinnersFromGroup(participants, numberOfNewsletterWinners + supporterWinner, false, handleAllIndex);
+
+
+
+        console.log(winners);
         return winners;
     }
+
+    pickWinnersByNumber(): Winner[] {
+
+        const state = this.stateContainer.getState();
+        const participants: Participant[] = state.participants;
+        const prices: Price[] = state.prices;
+        const winners: Winner[] = [];
+        const selectedIndexes: Set<number> = new Set(); // To keep track of selected participants
+
+        let numberOfSupporterWinners: number = state.numberOfSupporterWinners !== undefined ? state.numberOfSupporterWinners : 0;
+        let numberOfNewsletterWinners: number = state.numberOfNewsletterWinners !== undefined ? state.numberOfNewsletterWinners : 0;
+
+        // check if more numberOfSupporterWinners / numberOfNewsletterWinners are defined as supporter oder newsletter participants, if so, short it to that
+        if (state.numberOfSupporterParticipants !== undefined && state.numberOfSupporterParticipants < numberOfSupporterWinners) {
+            numberOfSupporterWinners = state.numberOfSupporterParticipants;
+        }
+
+        if (state.numberOfNewsletterParticipants !== undefined && state.numberOfNewsletterParticipants < numberOfNewsletterWinners) {
+            numberOfNewsletterWinners = state.numberOfNewsletterParticipants;
+        }
+
+
+
+
+        // Als Basis muss 
+
+        return winners;
+    }
+
+    // Function to pick winners by price type
+    pickWinnersByPrice(): Winner[] {
+        const state = this.stateContainer.getState();
+        const participants: Participant[] = state.participants;
+        const prices: Price[] = state.prices;
+        const winners: Winner[] = [];
+        const selectedIndexes: Set<number> = new Set(); // To keep track of selected participants
+
+        let numberOfSupporterWinners: number = state.numberOfSupporterWinners !== undefined ? state.numberOfSupporterWinners : 0;
+        let numberOfNewsletterWinners: number = state.numberOfNewsletterWinners !== undefined ? state.numberOfNewsletterWinners : 0;
+
+        // check if more prices are defined as supporter pr newsletter participants, if so, short it to that  
+        if (prices.length > 0) {
+            prices.forEach(price => {
+                if (price.priceType === "supporter") {
+                    numberOfSupporterWinners++;
+                } else {
+                    numberOfNewsletterWinners++;
+                }
+            });
+        }
+
+        // Function to pick winners from a specific group of participants
+        function pickWinnersFromGroup(group: Participant[], numberOfWinners: number, isSupporter: boolean): void {
+            const eligibleParticipants: Participant[] = group.filter(participant => (isSupporter && participant.isActive && !participant.hasNewsletter) || (!isSupporter && !participant.isActive && participant.hasNewsletter));
+
+            while (winners.length < numberOfWinners && eligibleParticipants.length > 0) {
+                const randomIndex = Math.floor(Math.random() * eligibleParticipants.length);
+                const winnerIndex = participants.findIndex(participant => participant === eligibleParticipants[randomIndex]);
+
+                if (!selectedIndexes.has(winnerIndex)) {
+                    const winner: Winner = {
+                        id: winners.length + 1,
+                        name: eligibleParticipants[randomIndex].firstName + " " + eligibleParticipants[randomIndex].lastName,
+                        email: eligibleParticipants[randomIndex].email,
+                        isSupporter: isSupporter,
+                        participantId: eligibleParticipants[randomIndex].id,
+                        priceId: null,
+                        index: winnerIndex // Storing the index of the winner in the original participants array
+                    };
+
+                    winners.push(winner);
+                    selectedIndexes.add(winnerIndex);
+                }
+                // Remove winner from eligible participants to prevent duplicate winners
+                eligibleParticipants.splice(randomIndex, 1);
+            }
+        }
+
+        // Pick winners based on price type
+        prices.forEach(price => {
+            if (price.priceType === 'supporter') {
+                pickWinnersFromGroup([...participants], numberOfSupporterWinners || 0, true);
+            } else if (price.priceType === 'newsletter') {
+                pickWinnersFromGroup([...participants], numberOfNewsletterWinners || 0, false);
+            } else if (price.priceType === 'all') {
+                pickWinnersFromGroup([...participants], state.numberOfSupporterWinners || 0, true); // Pick from all participants
+            }
+        });
+
+        return winners;
+    }
+
+    // Function to pick winners from a specific group of participants
+    pickWinnersFromGroup(group: Participant[], numberOfWinners: number, isSupporter: boolean, selectedIndexes: Set<number>, participants: Participant[]): Winner[] {
+    const winners: Winner[] = [];
+
+    while (winners.length < numberOfWinners && group.length > 0) {
+        const randomIndex = Math.floor(Math.random() * group.length);
+        const winnerIndex = participants.findIndex(participant => participant === group[randomIndex]);
+
+        if (!selectedIndexes.has(winnerIndex)) {
+            const winner: Winner = {
+                id: winners.length + 1,
+                name: group[randomIndex].firstName + " " + group[randomIndex].lastName,
+                email: group[randomIndex].email,
+                isSupporter: isSupporter,
+                participantId: group[randomIndex].id,
+                priceId: null,
+                index: winnerIndex // Storing the index of the winner in the original participants array
+            };
+
+            winners.push(winner);
+            selectedIndexes.add(winnerIndex);
+        }
+        // Remove winner from eligible participants to prevent duplicate winners
+        group.splice(randomIndex, 1);
+    }
+
+    return winners;
+}
 
     shortenEmailUsername(email: string, percentage: number): string {
         // Extract username from email using regex
@@ -79,7 +245,7 @@ export class Raffle {
 
         // Calculate number of characters to keep
         const keepCharacters = Math.ceil(username.length * (percentage / 100));
-        
+
         // Shorten username by replacing characters beyond keepCharacters with dots
         const shortenedUsername = username.slice(0, keepCharacters) + '.'.repeat(username.length - keepCharacters);
 
@@ -98,6 +264,6 @@ export class Raffle {
         const firstName = match[1];
         const lastNameInitial = match[2];
 
-        return firstName + " " + lastNameInitial ;
+        return firstName + " " + lastNameInitial;
     }
 }

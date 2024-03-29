@@ -11,7 +11,7 @@ $background: #fcfcfb;
 $disabled: #998c7d;
 $disabled-font: #e6dfd8;
 $navigation: #e6e4e2;
-$navigation-light:#edeae7;
+$navigation-light: #edeae7;
 $winner: rgb(96, 192, 96);
 $row: #e6dfd8;
 
@@ -121,17 +121,17 @@ p {
   margin: 10px 0;
 }
 
-a{
+a {
   text-decoration: none;
   color: $primary;
 
-  &:hover{
+  &:hover {
     opacity: 0.8;
   }
 }
 
 form.raffle-determination-type {
-  display:inline-block;
+  display: inline-block;
 }
 
 header {
@@ -162,7 +162,7 @@ header {
 }
 
 .content-wrapper {
-  position:absolute;
+  position: absolute;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -185,7 +185,7 @@ footer {
   width: 100%;
   text-align: right;
   font-size: 0.7em;
-  padding:1px 15px;
+  padding: 1px 15px;
   color: $disabled;
   box-sizing: border-box;
   background: $navigation-light;
@@ -202,13 +202,13 @@ button {
   color: rgb(255, 255, 255);
   border-radius: 25px;
   // margin: 10px;
-  font-size: 1.00em;
+  font-size: 1em;
   text-align: center;
   cursor: pointer;
 
-  &.internal{
+  &.internal {
     border-radius: 3px;
-    margin:0px;
+    margin: 0px;
     padding: 7px;
     font-size: 0.9em;
     margin-top: -4px;
@@ -228,10 +228,12 @@ button {
     background: $secondary;
     border-color: $secondary;
   }
-
 }
 
-input[type=text], input[type=number], textarea{
+input[type="text"],
+input[type="number"],
+select,
+textarea {
   height: fit-content;
   border-color: $primary;
   border-style: solid;
@@ -252,16 +254,37 @@ label {
   font-size: 0.9em;
 }
 
-#pricesContainer{
-  button{
-    margin: 5px 0 5px 6px;
-    display:inline-block;
+#pricesContainer {
+  button {
+    margin: 5px 0 5px 3px;
+    display: inline-block;
+    vertical-align: -1px;
   }
 
-  input[type=text] {
-    width: calc(100% - 96px);
+  select {
+    -webkit-appearance: none; /* Remove default Safari styles */
+    display: inline-block;
+    box-sizing: border-box;
+    width:auto;
+    margin-left: 3px;
+    background-color: white; /* Set background color */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>'); /* Add custom drop-down arrow */
+    background-repeat: no-repeat; /* Prevent repetition of background image */
+    background-position: right center; /* Position the arrow to the right of the select */
+    padding-right: 20px; /* Add space for the arrow */
+    font-size: 13px;
+  }
+
+  input[type="text"] {
+    width: calc(100% - 195px);
     display: inline-block;
   }
+}
+
+/* Style for when the select element is focused */
+select:focus {
+  //outline: none; /* Remove default focus outline */
+  border-color: $primary; /* Change border color when focused */
 }
 
 .row {
@@ -271,12 +294,13 @@ label {
   padding: 5px 0;
   margin: 10px 0;
 
-  .column{
-    display:inline-block;
+  .column {
+    display: inline-block;
     vertical-align: top;
+    box-sizing: border-box;
 
     label {
-      padding-top:25px;
+      padding-top: 25px;
     }
   }
 
@@ -291,11 +315,10 @@ label {
   }
 
   .column-3-3 {
-    width: 33.2%;
+    width: 33%;
   }
   .column-2-3 {
     width: 66.2%;
-
   }
   .column-1 {
     width: 100%;
@@ -305,7 +328,7 @@ label {
     text-align: center;
   }
 
-  &.highlight{
+  &.highlight {
     padding: 10px;
     background-color: #e6dfd8;
     border-radius: 3px;
@@ -315,10 +338,10 @@ label {
 .validation-output {
   background: $erros-background;
   border-radius: 3px;
-  padding:10px;
-  position:relative;
-  height:70px;
-  width:800px;
+  padding: 10px;
+  position: relative;
+  height: 70px;
+  width: 800px;
   color: $error;
   font-size: 0.8em;
   font-weight: $bold;
@@ -331,7 +354,7 @@ label {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  width: 100%; 
+  width: 100%;
 
   div.info-box {
     padding: 10px;
@@ -362,28 +385,31 @@ label {
       border: 0px;
       border-spacing: 0px;
 
-      &.prices-and-winner{
+      &.prices-and-winner {
         background-color: $primary-light;
-        th, tr{
-          width:50%;
+        th,
+        tr {
+          width: 50%;
           box-sizing: border-box;
         }
       }
     }
 
-    tr, td, th{
+    tr,
+    td,
+    th {
       border: solid 1px white;
       text-align: left;
-      padding:5px;
+      padding: 5px;
     }
 
-    th{
+    th {
       font-size: 0.8em;
     }
 
     &.winner {
       background: $primary;
-      padding:20px;
+      padding: 20px;
       border-radius: 3px;
       color: white;
       width: calc(50% - 5px);
@@ -391,13 +417,12 @@ label {
       min-height: 150px;
 
       div {
-        display:inline-block;
+        display: inline-block;
         &.column-left {
-          width:30px;
+          width: 30px;
         }
       }
     }
-
   }
 }
 

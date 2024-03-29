@@ -50,12 +50,14 @@ import "../scss/styles.scss";
 document.addEventListener("DOMContentLoaded", () => {
     // Input elements
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
-    const numberOfWinnersInput = document.getElementById('numberOfWinners') as HTMLInputElement;
+    //const numberOfWinnersInput = document.getElementById('numberOfWinners') as HTMLInputElement;
+    const numberOfSupporterWinnersInput = document.getElementById('numberOfSupporterWinners') as HTMLInputElement;
+    const numberOfNewsletterWinnersInput = document.getElementById('numberOfNewsletterWinners') as HTMLInputElement;
     const pricesRadio = document.getElementById('pricesRadio') as HTMLInputElement;
     const addPriceButton = document.getElementById('addPriceButton') as HTMLButtonElement;
     const pricesContainer = document.getElementById('pricesContainer') as HTMLDivElement;
 
-    // Buttond
+    // Buttons
     const raffleInfo = document.getElementById('raffle-info') as HTMLButtonElement;
     const raffleCreate = document.getElementById('raffle-create') as HTMLButtonElement;
     const raffleCreateReset = document.getElementById('raffle-create-reset') as HTMLButtonElement;
@@ -92,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
     raffleDeterminationType.style.display = "none";
 
     // Form input and submit logic and validation
-    if (numberOfWinnersRadio && numberOfWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform && determinationTypeRadios) {
+    if (numberOfWinnersRadio && numberOfSupporterWinnersInput && numberOfNewsletterWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform && determinationTypeRadios) {
 
         // View: Info
         raffleInfo.addEventListener('click', function () {
@@ -172,13 +174,19 @@ document.addEventListener("DOMContentLoaded", () => {
         // Eventmethod for winner number
         function numberOfWinnersRadioChange() {
             numberOfWinnersRadio.checked = true;
-            numberOfWinnersInput.disabled = false;
+            numberOfSupporterWinnersInput.disabled = false;
+            numberOfNewsletterWinnersInput.disabled = false;
             addPriceButton.disabled = true;
 
             // Disable price input fields and clear their values
             const priceInputs = document.querySelectorAll('input[name^="price"]');
             priceInputs.forEach(input => {
                 (input as HTMLInputElement).disabled = true;
+            });
+
+            const priceSelects = document.querySelectorAll('select[name^="price"]');
+            priceSelects.forEach(select => {
+                (select as HTMLSelectElement).disabled = true;
             });
 
             const removeButtons = document.querySelectorAll('button[name^="price_remove"]');
@@ -192,13 +200,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Eventlistener for add prices
         pricesRadio.addEventListener('change', function () {
-            numberOfWinnersInput.disabled = true;
+            numberOfSupporterWinnersInput.disabled = true;
+            numberOfNewsletterWinnersInput.disabled = true;
             addPriceButton.disabled = false;
 
             // Enable price input fields if previously disabled
             const priceInputs = document.querySelectorAll('input[name^="price"]');
             priceInputs.forEach(input => {
                 (input as HTMLInputElement).disabled = false;
+            });
+
+            const priceSelects = document.querySelectorAll('select[name^="price"]');
+            priceSelects.forEach(select => {
+                (select as HTMLSelectElement).disabled = false;
             });
 
             const removeButtons = document.querySelectorAll('button[name^="price_remove"]');
@@ -214,18 +228,39 @@ document.addEventListener("DOMContentLoaded", () => {
             input.type = 'text';
             input.name = `price${priceCount}`; // Increment counter for each new price input field
             input.placeholder = `${priceCount}. Preis`;
-
+        
+            const select = document.createElement('select');
+            select.name = `priceType${priceCount}`;
+            select.name = `price${priceCount}`;
+            
+            const supporterOption = document.createElement('option');
+            supporterOption.value = 'supporter';
+            supporterOption.text = 'Supporter';
+        
+            const newsletterOption = document.createElement('option');
+            newsletterOption.value = 'newsletter';
+            newsletterOption.text = 'Newsletter';
+        
+            const allOption = document.createElement('option');
+            allOption.value = 'all';
+            allOption.text = 'All';
+        
+            select.appendChild(supporterOption);
+            select.appendChild(newsletterOption);
+            select.appendChild(allOption);
+        
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.name = 'price_remove';
             removeButton.className = 'internal';
             removeButton.textContent = 'Entfernen';
             removeButton.addEventListener('click', function () {
-                // Remove the input field and the remove button
+                // Remove the input field, select, and the remove button
                 pricesContainer.removeChild(input);
+                pricesContainer.removeChild(select);
                 pricesContainer.removeChild(removeButton);
                 priceCount--;
-
+        
                 const priceInputs = document.querySelectorAll('input[name^="price"]');
                 let i = 1;
                 priceInputs.forEach(input => {
@@ -233,13 +268,55 @@ document.addEventListener("DOMContentLoaded", () => {
                     (input as HTMLInputElement).name = `price${i}`;
                     i++;
                 });
-
+        
+                const priceTypeSelects = document.querySelectorAll('select[name^="priceType"]');
+                priceTypeSelects.forEach(select => {
+                    (select as HTMLSelectElement).name = `priceType${i}`;
+                    i++;
+                });
+        
             });
-
+        
             pricesContainer.appendChild(input);
+            pricesContainer.appendChild(select);
             pricesContainer.appendChild(removeButton);
             priceCount++;
         });
+        
+
+        // addPriceButton.addEventListener('click', function () {
+        //     const input = document.createElement('input');
+        //     input.type = 'text';
+        //     input.name = `price${priceCount}`; // Increment counter for each new price input field
+        //     input.placeholder = `${priceCount}. Preis`;
+
+        //     const priceTypeSelect = document.createElement('input[type=]')
+
+        //     const removeButton = document.createElement('button');
+        //     removeButton.type = 'button';
+        //     removeButton.name = 'price_remove';
+        //     removeButton.className = 'internal';
+        //     removeButton.textContent = 'Entfernen';
+        //     removeButton.addEventListener('click', function () {
+        //         // Remove the input field and the remove button
+        //         pricesContainer.removeChild(input);
+        //         pricesContainer.removeChild(removeButton);
+        //         priceCount--;
+
+        //         const priceInputs = document.querySelectorAll('input[name^="price"]');
+        //         let i = 1;
+        //         priceInputs.forEach(input => {
+        //             (input as HTMLInputElement).placeholder = `${i}. Preis`;
+        //             (input as HTMLInputElement).name = `price${i}`;
+        //             i++;
+        //         });
+
+        //     });
+
+        //     pricesContainer.appendChild(input);
+        //     pricesContainer.appendChild(removeButton);
+        //     priceCount++;
+        // });
 
         useTestDataCheckbox.addEventListener('change', (event) => {
             let csvString: string;
@@ -291,7 +368,10 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             let validationText: string = "";
             let raffleName: string = "";
             let numberOfWinners: number = 0;
-            let priceItems: string[] = [];
+            let numberOfSupporterWinners: number = 0;
+            let numberOfNewsletterWinners: number = 0;
+            // let priceItems: string[] = [];
+            let priceItems: {priceText: string, priceType: string}[] = [];
             let csvString: string = "";
             let csvNewsletterString: string = "";
             let participantEntries: string[] = [];
@@ -337,6 +417,8 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
             }
 
+            console.log('Number of sup part and newsl part: '+raffleStateContainer.getState().numberOfSupporterParticipants+' '+raffleStateContainer.getState().numberOfNewsletterParticipants);
+
             if (csvNewsletterText.value === "" && csvText.value === "") {
                 validationText += "Du musst CSV-Text in eines der Textfelder kopieren.<br>";
             } else {
@@ -344,23 +426,29 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 const uniqueParticipants = raffleStateContainer.removeDuplicates(raffleStateContainer.getState().participants);
                 raffleStateContainer.setState({ participants: uniqueParticipants });
                 console.log('Participants after removing duplicated email ids:');
-                console.log(uniqueParticipants)
+                console.log(uniqueParticipants);
+                console.log('Number of sup part and newsl part 2: '+raffleStateContainer.getState().numberOfSupporterParticipants+' '+raffleStateContainer.getState().numberOfNewsletterParticipants);
+
             }
 
             let inactiveParticipants = 0;
-            for(let i = 0; i < raffleStateContainer.getState().participants.length; i++){
-                if(raffleStateContainer.getState().participants[i].supporterType !== "" && !raffleStateContainer.getState().participants[i].isActive){
+            for (let i = 0; i < raffleStateContainer.getState().participants.length; i++) {
+                if (raffleStateContainer.getState().participants[i].supporterType !== "" && !raffleStateContainer.getState().participants[i].isActive) {
                     inactiveParticipants++;
                 }
             }
 
             console.log('inactiveParticipants', inactiveParticipants);
-
             console.log('winner amount check');
+
             if (numberOfWinnersRadio.checked) {
-                if (numberOfWinnersInput.value !== "" && +numberOfWinnersInput.value > 0) {
-                    numberOfWinners = +numberOfWinnersInput.value;
-                    if (raffleStateContainer.getState().participants.length-inactiveParticipants < numberOfWinners) {
+                if ((numberOfSupporterWinnersInput.value !== "" && +numberOfSupporterWinnersInput.value > 0)
+                    || (numberOfNewsletterWinnersInput.value !== "" && +numberOfNewsletterWinnersInput.value > 0)) {
+                    numberOfSupporterWinners = +numberOfSupporterWinnersInput.value;
+                    numberOfNewsletterWinners = +numberOfNewsletterWinnersInput.value;
+                    numberOfWinners = numberOfSupporterWinners + numberOfNewsletterWinners;
+
+                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < numberOfWinners) {
                         validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren.<br>";
                     }
                 } else {
@@ -369,19 +457,36 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             }
 
             if (pricesRadio.checked) {
-                const priceInputs = document.querySelectorAll('input[name^="price"]');
+                const priceInputs = document.querySelectorAll('input[name^="price"], select[name^="price"]');
 
+                let htmlName: string;
+                let priceText: string;
+                let priceType: string;
+
+                // Collect priceText and priceType from html input / select elements and pass them to 
                 priceInputs.forEach(input => {
+                    
                     if ((input as HTMLInputElement).value !== "") {
-                        priceItems.push((input as HTMLInputElement).value);
+
+                        if(htmlName === (input as HTMLInputElement).name){
+                            priceType = (input as HTMLInputElement).value;
+                            console.log(priceText+' '+priceType);
+                            // priceItems.push((input as HTMLInputElement).value);
+                            priceItems.push({priceText, priceType});
+                        }else{
+                            priceText = (input as HTMLInputElement).value;
+                        }
+                        
+                        htmlName = (input as HTMLInputElement).name;
                     }
+
                 });
 
                 if (priceItems.length <= 0) {
                     validationText += "Du musst mindestens einen Preis angeben<br>";
                 }
 
-                if (raffleStateContainer.getState().participants.length-inactiveParticipants < priceItems.length) {
+                if (raffleStateContainer.getState().participants.length - inactiveParticipants < priceItems.length) {
                     validationText += "Du kannst nicht mehr Preise als Teilnehmer definieren.<br>";
                 }
             }
@@ -399,7 +504,9 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 const state = {
                     name: raffleName,
                     includeNewsletterParticipants: csvNewsletterText.value !== "" ? true : false, //includeNewsletterCheckbox.checked,
-                    numberOfWinners: numberOfWinners
+                    numberOfWinners: numberOfWinners,
+                    numberOfSupporterWinners: numberOfSupporterWinners,
+                    numberOfNewsletterWinners: numberOfNewsletterWinners
                 };
 
                 // Set state object
@@ -407,6 +514,10 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
                 console.log('Start rendering list data');
                 console.log(raffleStateContainer.getState().participants);
+
+                console.log('Show raffle');
+                console.log(raffleStateContainer.getState());
+
                 // Output summary
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
@@ -416,7 +527,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 raffleCreateReset.style.display = "inline-block";
                 raffleGoTo.style.display = "inline-block";
                 rafflePerform.style.display = "none";
-                raffleRepeat.style.display = "none"; 
+                raffleRepeat.style.display = "none";
 
                 // set veiw state
                 raffleStateContainer.setState({ view: "summary" });
@@ -664,15 +775,18 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         name: string;
         includeNewsletterParticipants: boolean;
         numberOfWinners?: number | null;
+        numberOfSupporterWinners?: number;
+        numberOfNewsletterWinners?: number;
         participants: Participant[];
         prices: Price[];
         winners: Winner[];
     }) {
         // if (raffleNameInput && includeNewsletterCheckbox && numberOfWinnersInput) { // TODO
-        if (raffleNameInput && numberOfWinnersInput) { // TODO
+        if (raffleNameInput && numberOfSupporterWinnersInput) { // TODO
             raffleNameInput.value = state.name;
             //includeNewsletterCheckbox.checked = state.includeNewsletterParticipants;
-            numberOfWinnersInput.value = state.numberOfWinners ? state.numberOfWinners.toString() : '';
+            numberOfSupporterWinnersInput.value = state.numberOfSupporterWinners ? state.numberOfSupporterWinners.toString() : '';
+            numberOfNewsletterWinnersInput.value = state.numberOfNewsletterWinners ? state.numberOfNewsletterWinners.toString() : '';
         }
     }
 
@@ -713,7 +827,11 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         name: "New Raffle",
         includeNewsletterParticipants: false,
         numberOfWinners: null,
+        numberOfSupporterWinners: 0,
+        numberOfNewsletterWinners: 0,
         participants: [],
+        numberOfSupporterParticipants: 0,
+        numberOfNewsletterParticipants: 0,
         prices: [],
         winners: [],
         view: "info",

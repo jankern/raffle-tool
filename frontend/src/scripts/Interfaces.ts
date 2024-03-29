@@ -11,6 +11,7 @@ export interface Participant {
 export interface Price {
     id: number;
     priceText: string;
+    priceType: string; // all, supporter, newsletter
 }
 
 export interface Winner {
@@ -28,7 +29,11 @@ export interface RaffleState {
     name: string;
     includeNewsletterParticipants: boolean;
     numberOfWinners?: number | null;
+    numberOfSupporterWinners?: number | undefined;
+    numberOfNewsletterWinners?: number | undefined;
     participants: Participant[];
+    numberOfSupporterParticipants?: number;
+    numberOfNewsletterParticipants?: number;
     prices: Price[];
     winners: Winner[];
     view: string; // info // create / summary / perform

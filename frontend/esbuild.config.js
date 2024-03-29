@@ -7,9 +7,9 @@ esbuild
     entryPoints: ["./src/scripts/main.ts"],
     bundle: true,
     outfile: "../build/sequencer-talk-raffle-tool/static/bundle.js",
-    sourcemap: false,
+    sourcemap: true,
     //watch: true,
-    minify: true, // Minify the output
+    minify: false, // Minify the output
     target: 'es2015', // Specify the target ECMAScript version
     loader: {
       '.png': 'file', // Use the file loader for PNG files

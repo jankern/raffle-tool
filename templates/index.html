@@ -113,8 +113,6 @@
                   cols="50"
                 ></textarea>
               </div>
-              <!-- </div>
-            <div class="row"> -->
               <div class="column column-1">
                 <label for="csvText">Newsletter-Import (CSV-Text):</label>
                 <textarea
@@ -132,26 +130,6 @@
               </div>
             </div>
           </div>
-          <!-- <div class="row">
-            <div class="column column-3-3">
-              <input
-                type="checkbox"
-                id="includeSupporter"
-                name="includeSupporter"
-                checked
-                disabled
-              />
-              <label for="includeSupporter">Mit Supporter</label>
-            </div>
-            <div class="column column-2-3">
-              <input
-                type="checkbox"
-                id="includeNewsletter"
-                name="includeNewsletter"
-              />
-              <label for="includeNewsletter">Mit Newsletter-Abonnenten</label>
-            </div>
-          </div> -->
           <div class="row">
             <div class="column column-3-3">
               <input
@@ -164,11 +142,21 @@
                 >Gewinneranzahl festlegen:</label
               >
             </div>
-            <div class="column column-2-3">
+            <div class="column column-3-3">
               <input
                 type="number"
-                id="numberOfWinners"
-                name="numberOfWinners"
+                id="numberOfSupporterWinners"
+                name="numberOfSupporterWinners"
+                placeholder="Supporter-Anzahl"
+                disabled
+              />
+            </div>
+            <div class="column column-3-3">
+              <input
+                type="number"
+                id="numberOfNewsletterWinners"
+                name="numberOfNewsletterWinners"
+                placeholder="Newsletter-Anzahl"
                 disabled
               />
             </div>
@@ -212,7 +200,7 @@
         <div class="raffle-data" id="winner-output"></div>
       </div>
     </div>
-    <footer>v1.1.3</footer>
+    <footer>Beta.v1.1.3</footer>
     <script src="./static/bundle.js"></script>
   </body>
 </html>

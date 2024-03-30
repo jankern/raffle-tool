@@ -171,5 +171,20 @@ export class RaffleStateContainer {
         return uniqueParticipants;
     }
 
-    // Add other state management methods as needed
+    validateCSV(csvString: string): boolean {
+        // Split the CSV string into lines
+        const lines = csvString.trim().split('\n');
+
+        // Check if there is at least one line in the CSV
+        if (lines.length === 0) {
+            console.error("CSV string is empty.");
+            return false;
+        }
+
+        // Assuming each line represents a participant, you can perform further validation on each line if needed
+        // For example, you might check if each line has the expected number of fields, if fields are properly formatted, etc.
+
+        // If the CSV string passes all validation checks, return true
+        return true;
+    }
 }

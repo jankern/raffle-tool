@@ -1,5 +1,5 @@
 /* 
-    Main ts file to handle the raffle project
+    Main ts file to handle the raffle project and controll the UI
 */
 
 import { RaffleState, Participant, Winner, Price } from "./Interfaces";
@@ -9,7 +9,8 @@ import { Raffle } from "./Raffle";
 import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Input elements
+
+    // Input / radio elements
     const headerEl = document.getElementById('header') as HTMLElement;
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
     const numberOfSupporterWinnersInput = document.getElementById('numberOfSupporterWinners') as HTMLInputElement;
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const raffleDeterminationType = document.getElementById('raffle-determination-type') as HTMLButtonElement;
     const raffleWinnerHeadline = document.getElementById('raffle-winner-headline') as HTMLElement;
 
+    // Textfields / Selects
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
     const csvNewsletterText = document.getElementById('csvNewsletterText') as HTMLTextAreaElement;
     const raffleNameInput = document.getElementById('raffleName') as HTMLInputElement;
@@ -45,7 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let consecutivelyIterator: number = 0;
 
-    raffleInfo.style.display = "inline-block"; // TODO move to a function
+    // Menu buttons initial states
+    raffleInfo.style.display = "inline-block"; 
     raffleCreate.style.display = "none";
     raffleCreateReset.style.display = "none";
     raffleSummary.style.display = "none";
@@ -54,92 +57,72 @@ document.addEventListener("DOMContentLoaded", () => {
     raffleRepeat.style.display = "none";
     raffleDeterminationType.style.display = "none";
 
-    // Form input and submit logic and validation
+    // Function to enable and disable menu buttons
+    function stateDisplayForMenuAndPages(
+        raffleInfoDisplay: string,
+        raffleCreateDisplay: string,
+        raffleCreateResetDisplay: string,
+        raffleSummaryDisplay: string,
+        raffleGoToDisplay: string,
+        rafflePerformDisplay: string,
+        raffleRepeatDisplay: string,
+        raffleDeterminationTypeDisplay: string
+    ): void {
+        raffleInfo.style.display = raffleInfoDisplay;
+        raffleCreate.style.display = raffleCreateDisplay;
+        raffleCreateReset.style.display = raffleCreateResetDisplay;
+        raffleSummary.style.display = raffleSummaryDisplay;
+        raffleGoTo.style.display = raffleGoToDisplay;
+        rafflePerform.style.display = rafflePerformDisplay;
+        raffleRepeat.style.display = raffleRepeatDisplay;
+        raffleDeterminationType.style.display = raffleDeterminationTypeDisplay;
+    }
+
+    // Raffle create and perform UI with form validation
     if (numberOfWinnersRadio && numberOfSupporterWinnersInput && numberOfNewsletterWinnersInput && pricesRadio && addPriceButton && pricesContainer && raffleCreate && rafflePerform && determinationTypeRadios) {
 
-        // View: Info
-        raffleInfo.addEventListener('click', function () {
-
-            raffleInfo.style.display = "none";
-            raffleCreate.style.display = "inline-block";
-            raffleCreateReset.style.display = "none";
-            raffleSummary.style.display = "none";
-            raffleGoTo.style.display = "none";
-            rafflePerform.style.display = "none";
-            raffleRepeat.style.display = "none";
-            raffleDeterminationType.style.display = "none";
-
+        function raffleInfoEvent(): void {
             raffleStateContainer.setState({ view: "create" });
-            orderContentLayer('create'); // TODO use state value
-        });
+            stateDisplayForMenuAndPages("none", "inline-block", "none", "none", "none", "none", "none", "none");
+            stateOrderContentLayer('create'); // TODO use getState value
+        }
+
+        // View: Info
+        raffleInfo.addEventListener('click', raffleInfoEvent);
 
         // View: Raffle reset / edit
-        raffleCreateReset.addEventListener('click', function () {
+        raffleCreateReset.addEventListener('click', raffleInfoEvent);
 
-            raffleInfo.style.display = "none";
-            raffleCreate.style.display = "inline-block";
-            raffleCreateReset.style.display = "none";
-            raffleSummary.style.display = "none";
-            raffleGoTo.style.display = "none";
-            rafflePerform.style.display = "none";
-            raffleRepeat.style.display = "none";
-            raffleDeterminationType.style.display = "none";
+        function raffleSummaryEvent(): void {
+            raffleStateContainer.setState({ view: "summary" });
+            stateDisplayForMenuAndPages("none", "none", "inline-block", "none", "inline-block", "none", "none", "none");
+            stateOrderContentLayer('summary');
+        }
 
-            raffleStateContainer.setState({ view: "create" });
-            orderContentLayer('create');
-        });
-
-        raffleSummary.addEventListener('click', function () {
-
-            raffleStateContainer.setState({ view: 'summary' });
-
-            raffleInfo.style.display = "none";
-            raffleCreate.style.display = "none";
-            raffleCreateReset.style.display = "inline-block";
-            raffleSummary.style.display = "none";
-            raffleGoTo.style.display = "inline-block";
-            rafflePerform.style.display = "none";
-            raffleRepeat.style.display = "none";
-            raffleDeterminationType.style.display = "none";
-            orderContentLayer('summary');
-
-            //raffleStateContainer.setState({view: "raffle"});
-        });
+        // View: Summary
+        raffleSummary.addEventListener('click', raffleSummaryEvent);
 
         // View: Raffle Go To
-        raffleGoTo.addEventListener('click', function () {
-
-            // raffleStateContainer.setState({ view: 'raffle', winners: [] });
-            raffleStateContainer.setState({ view: 'raffle' });
-            //winnerOutput.innerHTML = "";
+        raffleGoTo.addEventListener('click', (event: Event): void => {
             consecutivelyIterator = 0;
-
-            raffleInfo.style.display = "none";
-            raffleCreate.style.display = "none";
-            raffleCreateReset.style.display = "none";
-            raffleSummary.style.display = "inline-block";
-            raffleGoTo.style.display = "none";
-            rafflePerform.style.display = "inline-block";
-            raffleRepeat.style.display = "none";
-            raffleDeterminationType.style.display = "inline-block";
-            orderContentLayer('raffle');
+            raffleStateContainer.setState({ view: "raffle" });
+            stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "inline-block", "none", "inline-block");
+            stateOrderContentLayer('raffle');
 
             if (raffleStateContainer.getState().winners.length > 0) {
                 rafflePerform.style.display = "none";
                 raffleRepeat.style.display = "inline-block";
             }
-
-            //raffleStateContainer.setState({view: "raffle"});
         });
 
         // Eventmethod for winner number
-        function numberOfWinnersRadioChange() {
+        function numberOfWinnersRadioChange(): void {
             numberOfWinnersRadio.checked = true;
             numberOfSupporterWinnersInput.disabled = false;
             numberOfNewsletterWinnersInput.disabled = false;
             addPriceButton.disabled = true;
 
-            // Disable price input fields and clear their values
+            // Disable price inputs fields and clear their values
             const priceInputs = document.querySelectorAll('input[name^="price"]');
             priceInputs.forEach(input => {
                 (input as HTMLInputElement).disabled = true;
@@ -160,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         numberOfWinnersRadio.addEventListener('change', numberOfWinnersRadioChange);
 
         // Eventlistener for add prices
-        pricesRadio.addEventListener('change', function () {
+        pricesRadio.addEventListener('change', (event: Event): void => {
             numberOfSupporterWinnersInput.disabled = true;
             numberOfNewsletterWinnersInput.disabled = true;
             addPriceButton.disabled = false;
@@ -182,9 +165,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // JavaScript code for adding input fields dynamically for prices
+        // Adding input fields dynamically for prices
         let priceCount = 1; // Counter for naming price input fields
-        addPriceButton.addEventListener('click', function () {
+        addPriceButton.addEventListener('click', (event: Event): void => {
             const input = document.createElement('input');
             input.type = 'text';
             input.name = `price${priceCount}`; // Increment counter for each new price input field
@@ -215,6 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
             removeButton.name = 'price_remove';
             removeButton.className = 'internal';
             removeButton.textContent = 'Entfernen';
+
+            // Adding dynamically event listerns for remove buttons for each price row
             removeButton.addEventListener('click', function () {
                 // Remove the input field, select, and the remove button
                 pricesContainer.removeChild(input);
@@ -244,42 +229,8 @@ document.addEventListener("DOMContentLoaded", () => {
             priceCount++;
         });
 
-
-        // addPriceButton.addEventListener('click', function () {
-        //     const input = document.createElement('input');
-        //     input.type = 'text';
-        //     input.name = `price${priceCount}`; // Increment counter for each new price input field
-        //     input.placeholder = `${priceCount}. Preis`;
-
-        //     const priceTypeSelect = document.createElement('input[type=]')
-
-        //     const removeButton = document.createElement('button');
-        //     removeButton.type = 'button';
-        //     removeButton.name = 'price_remove';
-        //     removeButton.className = 'internal';
-        //     removeButton.textContent = 'Entfernen';
-        //     removeButton.addEventListener('click', function () {
-        //         // Remove the input field and the remove button
-        //         pricesContainer.removeChild(input);
-        //         pricesContainer.removeChild(removeButton);
-        //         priceCount--;
-
-        //         const priceInputs = document.querySelectorAll('input[name^="price"]');
-        //         let i = 1;
-        //         priceInputs.forEach(input => {
-        //             (input as HTMLInputElement).placeholder = `${i}. Preis`;
-        //             (input as HTMLInputElement).name = `price${i}`;
-        //             i++;
-        //         });
-
-        //     });
-
-        //     pricesContainer.appendChild(input);
-        //     pricesContainer.appendChild(removeButton);
-        //     priceCount++;
-        // });
-
-        useTestDataCheckbox.addEventListener('change', (event) => {
+        // Checkbox to generate test content for supporter and nwesletter participants
+        useTestDataCheckbox.addEventListener('change', (event: Event): void => {
             let csvString: string;
             let csvNewsletterString: string;
 
@@ -323,7 +274,8 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
         });
 
-        function raffleCreateEvent(event: any) {
+        // Function to create the raffle, output summary and fill the state
+        raffleCreate.addEventListener('click', (event: Event): void => {
 
             // prevent form from general submit
             event.preventDefault();
@@ -333,7 +285,6 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             let numberOfWinners: number = 0;
             let numberOfSupporterWinners: number = 0;
             let numberOfNewsletterWinners: number = 0;
-            // let priceItems: string[] = [];
             let priceItems: { priceText: string, priceType: string }[] = [];
             let csvString: string = "";
             let csvNewsletterString: string = "";
@@ -347,11 +298,10 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             }
 
             if (csvText.value !== "") {
-
-                // import participants
+                // import supporter participants
                 csvString = csvText.value;
 
-                if (validateCSV(csvString)) {
+                if (raffleStateContainer.validateCSV(csvString)) {
                     // Proceed with importing the CSV string
                     console.log('import Supporter CSV');
                     raffleStateContainer.importCSV(csvString, true);
@@ -359,17 +309,14 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     // Handle invalid CSV string
                     validationText += "Das CSV-Format ist nicht korrekt.<br>";
                 }
-
             }
 
             if (csvNewsletterText.value !== "") {
-
-                // import participants
+                // import newsletter participants
                 csvNewsletterString = csvNewsletterText.value;
-
                 let isParticipantsReset: boolean = csvText.value === "" ? true : false;
 
-                if (validateCSV(csvNewsletterString)) {
+                if (raffleStateContainer.validateCSV(csvNewsletterString)) {
                     // Proceed with importing the CSV string
                     console.log('import Newsletter CSV');
                     raffleStateContainer.importCSV(csvNewsletterString, isParticipantsReset);
@@ -377,10 +324,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     // Handle invalid CSV string
                     validationText += "Das CSV-Format ist nicht korrekt.<br>";
                 }
-
             }
-
-            console.log('Number of sup part and newsl part: ' + raffleStateContainer.getState().numberOfSupporterParticipants + ' ' + raffleStateContainer.getState().numberOfNewsletterParticipants);
 
             if (csvNewsletterText.value === "" && csvText.value === "") {
                 validationText += "Du musst CSV-Text in eines der Textfelder kopieren.<br>";
@@ -388,10 +332,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 // Check for duplicats
                 const uniqueParticipants = raffleStateContainer.removeDuplicates(raffleStateContainer.getState().participants);
                 raffleStateContainer.setState({ participants: uniqueParticipants });
-                console.log('Participants after removing duplicated email ids:');
-                console.log(uniqueParticipants);
-                console.log('Number of sup part and newsl part 2: ' + raffleStateContainer.getState().numberOfSupporterParticipants + ' ' + raffleStateContainer.getState().numberOfNewsletterParticipants);
-
+                console.log('Participants after removing duplicated email ids:', uniqueParticipants);
             }
 
             let inactiveParticipants = 0;
@@ -401,13 +342,10 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 }
             }
 
-            console.log('inactiveParticipants', inactiveParticipants);
-
-            // Validate if supporter and newsletter are entered nad if they don't exceed the participant amount
+            // Validate if supporter and newsletter participants are filled and if they don't exceed the participant amount
             if (numberOfWinnersRadio.checked) {
-
                 const state = raffleStateContainer.getState();
-
+                // Supporter
                 if (numberOfSupporterWinnersInput.value !== "" && +numberOfSupporterWinnersInput.value > 0) {
 
                     if (state && state.numberOfSupporterParticipants !== undefined) {
@@ -423,7 +361,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                         validationText += "Du musst eine Gewinneranzahl von Supportern eingeben.<br>";
                     }
                 }
-
+                // Newsletter
                 if (numberOfNewsletterWinnersInput.value !== "" && +numberOfNewsletterWinnersInput.value > 0) {
 
                     if (state && state.numberOfNewsletterParticipants !== undefined) {
@@ -439,17 +377,17 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     }
                 }
 
-                // Check if the overall participant list length matches 
+                // Check if the overall participant list length matches the filled entries
                 if (state && state.numberOfSupporterParticipants !== undefined && state && state.numberOfNewsletterParticipants !== undefined) {
-                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < ((+numberOfSupporterWinnersInput.value)+(+numberOfSupporterWinnersInput.value))) {
+                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < ((+numberOfSupporterWinnersInput.value) + (+numberOfSupporterWinnersInput.value))) {
                         validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren (max. " + (raffleStateContainer.getState().participants.length - inactiveParticipants) + ").<br>";
                     }
                 }
 
                 numberOfWinners = numberOfSupporterWinners + numberOfNewsletterWinners;
-
             }
 
+            // Validate if prices values are correct and create the prices
             if (pricesRadio.checked) {
                 const priceInputs = document.querySelectorAll('input[name^="price"], select[name^="price"]');
 
@@ -468,10 +406,8 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
                         if (htmlName === (input as HTMLInputElement).name) {
                             priceType = (input as HTMLInputElement).value;
-
                             // Regexp for str
                             const hasContentRegExp = /\S/;
-
                             // Check if no priceType is selected for supporter or newsletter when they are empty
                             if (!hasContentRegExp.test(csvText.value) && priceType === "supporter") {
                                 hasSupporterInputFailed = true;
@@ -480,23 +416,21 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                             if (!hasContentRegExp.test(csvNewsletterText.value) && priceType === "newsletter") {
                                 hasNewsletterInputFailed = true;
                             }
-
+                            // Count how much prices are assigned to supporters
                             if (priceType === "supporter") {
                                 numberOfSupporterSelect++;
                             }
-
+                            // Count how much prices are assigned to nesletter participants
                             if (priceType === "newsletter") {
                                 numberOfNewsletterSelect++;
                             }
-
+                            // add price text and type
                             priceItems.push({ priceText, priceType });
                         } else {
                             priceText = (input as HTMLInputElement).value;
                         }
-
                         htmlName = (input as HTMLInputElement).name;
                     }
-
                 });
 
 
@@ -515,7 +449,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 // Check if less / equal supporters or newsletters are targeted via priceType
                 let state = raffleStateContainer.getState();
                 if (state && state.numberOfSupporterParticipants !== undefined) {
-                    if (state.numberOfSupporterParticipants > 0 && state.numberOfSupporterParticipants  - inactiveParticipants < numberOfSupporterSelect) {
+                    if (state.numberOfSupporterParticipants > 0 && state.numberOfSupporterParticipants - inactiveParticipants < numberOfSupporterSelect) {
                         validationText += "Du musst eine gültige Preisanzahl von Supportern definieren (max. " + (state.numberOfSupporterParticipants - inactiveParticipants) + ").<br>";
                     }
                 }
@@ -534,7 +468,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 }
             }
 
-            // Submit form only if validation string is empty
+            // Submit form only if validation string is empty, hence all fields are correctly filled
             if (validationText === "") {
 
                 validationOutput.innerHTML = "";
@@ -555,28 +489,19 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 // Set state object
                 raffleStateContainer.setState(state);
 
-                console.log('Start rendering list data');
-                console.log(raffleStateContainer.getState().participants);
+                console.log('Start rendering participant list data', raffleStateContainer.getState().participants);
+                console.log('Show raffle', raffleStateContainer.getState());
 
-                console.log('Show raffle');
-                console.log(raffleStateContainer.getState());
-
-                // Output summary
+                // Output summary data
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
-                raffleInfo.style.display = "none";
-                raffleCreate.style.display = "none";
-                raffleCreateReset.style.display = "inline-block";
-                raffleGoTo.style.display = "inline-block";
-                rafflePerform.style.display = "none";
-                raffleRepeat.style.display = "none";
-
-                // set veiw state
-                raffleStateContainer.setState({ view: "summary" });
-                orderContentLayer('summary');
+                // Set view and state for summary
+                raffleSummaryEvent();
+                raffleWinnerHeadline.textContent = raffleStateContainer.getState().name;
 
             } else {
+                // Show validation container and scroll to top
                 validationOutput.innerHTML = validationText;
                 validationOutput.style.display = 'block';
 
@@ -585,20 +510,18 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     behavior: 'smooth'
                 });
             }
+        });
 
-        }
-
-        // Eventlistener for create raffle, output summary and fill the state
-        raffleCreate.addEventListener('click', raffleCreateEvent);
-
+        // Radio to check if the raffle winners should be displayed at once or after each other by pushed used user button
         determinationTypeRadios.forEach(radio => {
-            radio.addEventListener('change', function (event) {
+            radio.addEventListener('change', (evenet: Event): void => {
                 const checkedValue = (document.querySelector<HTMLInputElement>('input[name="determinationType"]:checked') as HTMLInputElement)?.value;
                 raffleStateContainer.setState({ determinationType: checkedValue });
             });
         });
 
-        rafflePerform.addEventListener('click', function (event) {
+        // Function to perform the raffle game
+        rafflePerform.addEventListener('click', (event: Event): void => {
             event.preventDefault();
 
             // Set view state
@@ -610,7 +533,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 updateParticipantListAndPrices();
             }
 
-            // Reverse array and add price if needed
+            // Reverse array and add price if available
             const reversedWinners: Winner[] = [...raffleStateContainer.getState().winners].reverse();
 
             if (raffleStateContainer.getState().determinationType === "simultaneously") {
@@ -627,17 +550,10 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     return `<div class="info-box winner"><div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}</div>`;
                 }).join('');
 
-                rafflePerform.textContent = "Raffle";
-
-                raffleInfo.style.display = "none";
-                raffleSummary.style.display = "inline-block";
-                raffleCreateReset.style.display = "none";
-                raffleGoTo.style.display = "none";
-                rafflePerform.style.display = "none";
-                raffleRepeat.style.display = "inline-block";
-
+                rafflePerform.textContent = raffleStateContainer.getState().name;
                 raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
 
+                stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "none", "inline-block", "inline-block");
             } else {
                 // Print winners consecutively
                 if (consecutivelyIterator < reversedWinners.length) {
@@ -656,32 +572,17 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                     el.innerHTML = `<div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}`;
                     consecutivelyIterator++;
 
-                    raffleSummary.style.display = "none";
-                    raffleCreateReset.style.display = "none";
-
+                    // Set menu display
+                    stateDisplayForMenuAndPages("none", "none", "none", "none", "none", "inline-block", "none", "inline-block");
                     rafflePerform.textContent = "Raffle (" + consecutivelyIterator + "/" + reversedWinners.length + ")";
 
                     if (consecutivelyIterator === reversedWinners.length) {
-
-                        // raffleCreateReset.style.display = "inline-block";
-                        rafflePerform.style.display = "none";
-                        raffleSummary.style.display = "inline-block";
-                        raffleRepeat.style.display = "inline-block"
+                        // Set menu display when stepped raffle is done
+                        stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "none", "inline-block", "inline-block");
                     }
                     raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
-
-                } else {
-
-                    // raffleInfo.style.display = "none";
-                    // raffleCreate.style.display = "non";
-                    // raffleCreateReset.style.display = "inline-block";
-                    // raffleGoTo.style.display = "none";
-                    // rafflePerform.style.display = "none";
-                    // raffleRepeat.style.display = "inline-block";
-                    //consecutivelyIterator = 0; // Reset iterator if reached the end of the array
-                }
+                } 
             }
-
         });
 
         raffleRepeat.addEventListener('click', function (event) {
@@ -691,21 +592,13 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
             rafflePerform.textContent = "Raffle";
+            raffleWinnerHeadline.textContent = "Raffle GO!!!"
             raffleStateContainer.setState({ view: 'raffle', winners: [] });
             winnerOutput.innerHTML = "";
             consecutivelyIterator = 0;
 
-            raffleInfo.style.display = "none";
-            raffleCreate.style.display = "none";
-            raffleCreateReset.style.display = "none";
-            raffleSummary.style.display = "nline-block";
-            raffleGoTo.style.display = "none";
-            rafflePerform.style.display = "inline-block";
-            raffleRepeat.style.display = "none";
-
-            raffleWinnerHeadline.textContent = "Raffle GO!!!"
-
-            //raffleStateContainer.setState({view: "raffle"});
+            // Set menu display when stepped raffle is done
+            stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "inline-block", "none", "inline-block");
         });
 
         // Call radio selection for winner at page load
@@ -786,6 +679,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         participantsOutput.innerHTML += table;
     }
 
+    // Function to update the participant table after the raffle
     function updateParticipantListAndPrices() {
 
         if (raffleStateContainer.getState().winners.length > 0) {
@@ -836,24 +730,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         }
     }
 
-    function validateCSV(csvString: string): boolean {
-        // Split the CSV string into lines
-        const lines = csvString.trim().split('\n');
-
-        // Check if there is at least one line in the CSV
-        if (lines.length === 0) {
-            console.error("CSV string is empty.");
-            return false;
-        }
-
-        // Assuming each line represents a participant, you can perform further validation on each line if needed
-        // For example, you might check if each line has the expected number of fields, if fields are properly formatted, etc.
-
-        // If the CSV string passes all validation checks, return true
-        return true;
-    }
-
-    function orderContentLayer(state: string): void {
+    function stateOrderContentLayer(state: string): void {
         const contentLayers = document.querySelectorAll<HTMLInputElement>('.content-wrapper');
         let i = 1;
         contentLayers.forEach(content => {
@@ -889,10 +766,6 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
     // Create an instance of the Raffle class (business logic) with the state container
     const raffle = new Raffle(raffleStateContainer);
-
-    // Example usage of Raffle class
-    //const winner = raffle.pickWinner();
-    //console.log(winner);
 
     // Update the form with initial state values
     updateFormWithState(initialState);

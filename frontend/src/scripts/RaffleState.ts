@@ -1,3 +1,8 @@
+/*
+    Author: Jan Kern, 2024
+    Class to manage state related tasks
+*/
+
 import { Participant, Price, Winner, RaffleState } from './Interfaces';
 
 export class RaffleStateContainer {
@@ -94,8 +99,6 @@ export class RaffleStateContainer {
 
         console.log(this.getState());
     }
-
-    // TODO: Function to make list unique by email
 
     addParticipants(participants: Participant[]): void {
 

@@ -1,3 +1,8 @@
+/*
+    Author: Jan Kern, 2024
+    Class to keep the raffle business logic
+*/
+
 import { forEachChild } from 'typescript';
 import { Participant, Price, Winner } from './Interfaces';
 import { RaffleStateContainer } from './RaffleState';

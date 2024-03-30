@@ -1,4 +1,5 @@
 /* 
+    Author: Jan Kern, 2024
     Main ts file to handle the raffle project and controll the UI
 */
 

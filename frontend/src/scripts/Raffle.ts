@@ -21,6 +21,7 @@ export class Raffle {
         let numberOfSupporterWinners: number = state.numberOfSupporterWinners !== undefined ? state.numberOfSupporterWinners : 0;
         let numberOfNewsletterWinners: number = state.numberOfNewsletterWinners !== undefined ? state.numberOfNewsletterWinners : 0;
 
+        // Case if having prices defined
         if (prices.length > 0) {
             prices.forEach(price => {
                 let eligibleParticipants: Participant[] = [];
@@ -35,10 +36,10 @@ export class Raffle {
                 }
 
                 // Pick winners from the current group of eligible participants
-                this.pickWinnersFromGroup(eligibleParticipants, eligibleParticipants.length, selectedIndexes, winners, price);
+                this.pickWinnersFromGroup(eligibleParticipants, 1/*eligibleParticipants.length*/, selectedIndexes, winners, price);
             });
         } else {
-
+            // Case if having only winner number defined
             let eligibleSupporterParticipants: Participant[] = [];
             let eligibleNewsletterParticipants: Participant[] = [];
 
@@ -60,7 +61,8 @@ export class Raffle {
 
         let i = 0;
 
-        while ((winners.length < numberOfWinners && group.length > 0) || (price && i < numberOfWinners)) {
+        // Looping either for winner number twice (supporter / newsleter) or looping for each price (supporter / newsletter / all)
+        while ((winners.length < numberOfWinners && group.length > 0 && !price) || (price && i < numberOfWinners)) {
             const randomIndex = Math.floor(Math.random() * group.length);
             const winnerIndex = group.findIndex(participant => participant === group[randomIndex]);
 
@@ -78,14 +80,15 @@ export class Raffle {
                 winners.push(winner);
                 // selectedIndexes.add(winnerIndex);
                 selectedIndexes.add(group[randomIndex].email);
+                // Iterate only if no dupliate has been found, otherwise loop again
+                i++;
             }
             // Remove winner from eligible participants to prevent duplicate winners
             group.splice(randomIndex, 1);
-            i++;
         }
     }
 
-    shortenEmailUsername(email: string, percentage: number): string {
+    shortenEmailUsername(email: string, percentage: number, withTld: boolean): string {
         // Extract username from email using regex
         const match = email.match(/^(.+)@(.+)$/);
         if (!match || match.length < 3) {
@@ -93,7 +96,7 @@ export class Raffle {
         }
         const username = match[1];
         const domainParts = match[2].split('.');
-        const topLevelDomain = domainParts[domainParts.length - 1];
+        const topLevelDomain = withTld ? domainParts[domainParts.length - 1] : "";
 
         // Calculate number of characters to keep
         const keepCharacters = Math.ceil(username.length * (percentage / 100));

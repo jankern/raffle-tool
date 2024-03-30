@@ -383,6 +383,7 @@ select:focus {
       background-color: $row;
       border: 0px;
       border-spacing: 0px;
+      line-break: anywhere;
 
       &.prices-and-winner {
         background-color: $primary-light;
@@ -455,19 +456,6 @@ select:focus {
 
 @font-face {
   font-family: "Hind Siliguri";
-  src: url("fonts/HindSiliguri-Bold.eot");
-  src: url("fonts/HindSiliguri-Bold.eot?#iefix") format("embedded-opentype"),
-    url("fonts/HindSiliguri-Bold.woff2") format("woff2"),
-    url("fonts/HindSiliguri-Bold.woff") format("woff"),
-    url("fonts/HindSiliguri-Bold.ttf") format("truetype"),
-    url("fonts/HindSiliguri-Bold.svg#HindSiliguri-Bold") format("svg");
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hind Siliguri";
   src: url("fonts/HindSiliguri-Medium.eot");
   src: url("fonts/HindSiliguri-Medium.eot?#iefix") format("embedded-opentype"),
     url("fonts/HindSiliguri-Medium.woff2") format("woff2"),
@@ -494,59 +482,6 @@ select:focus {
 
 @font-face {
   font-family: "Hind Siliguri";
-  src: url("fonts/HindSiliguri-Regular.eot");
-  src: url("fonts/HindSiliguri-Regular.eot?#iefix") format("embedded-opentype"),
-    url("fonts/HindSiliguri-Regular.woff2") format("woff2"),
-    url("fonts/HindSiliguri-Regular.woff") format("woff"),
-    url("fonts/HindSiliguri-Regular.ttf") format("truetype"),
-    url("fonts/HindSiliguri-Regular.svg#HindSiliguri-Regular") format("svg");
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hind Siliguri";
-  src: url("fonts/HindSiliguri-SemiBold_1.eot");
-  src: url("fonts/HindSiliguri-SemiBold_1.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/HindSiliguri-SemiBold_1.woff2") format("woff2"),
-    url("fonts/HindSiliguri-SemiBold_1.woff") format("woff"),
-    url("fonts/HindSiliguri-SemiBold_1.ttf") format("truetype"),
-    url("fonts/HindSiliguri-SemiBold_1.svg#HindSiliguri-SemiBold") format("svg");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hind Siliguri";
-  src: url("fonts/HindSiliguri-Medium_1.eot");
-  src: url("fonts/HindSiliguri-Medium_1.eot?#iefix") format("embedded-opentype"),
-    url("fonts/HindSiliguri-Medium_1.woff2") format("woff2"),
-    url("fonts/HindSiliguri-Medium_1.woff") format("woff"),
-    url("fonts/HindSiliguri-Medium_1.ttf") format("truetype"),
-    url("fonts/HindSiliguri-Medium_1.svg#HindSiliguri-Medium") format("svg");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hind Siliguri";
-  src: url("fonts/HindSiliguri-Light_1.eot");
-  src: url("fonts/HindSiliguri-Light_1.eot?#iefix") format("embedded-opentype"),
-    url("fonts/HindSiliguri-Light_1.woff2") format("woff2"),
-    url("fonts/HindSiliguri-Light_1.woff") format("woff"),
-    url("fonts/HindSiliguri-Light_1.ttf") format("truetype"),
-    url("fonts/HindSiliguri-Light_1.svg#HindSiliguri-Light") format("svg");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hind Siliguri";
   src: url("fonts/HindSiliguri-Bold_1.eot");
   src: url("fonts/HindSiliguri-Bold_1.eot?#iefix") format("embedded-opentype"),
     url("fonts/HindSiliguri-Bold_1.woff2") format("woff2"),
@@ -554,20 +489,6 @@ select:focus {
     url("fonts/HindSiliguri-Bold_1.ttf") format("truetype"),
     url("fonts/HindSiliguri-Bold_1.svg#HindSiliguri-Bold") format("svg");
   font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Hind Siliguri";
-  src: url("fonts/HindSiliguri-Regular_1.eot");
-  src: url("fonts/HindSiliguri-Regular_1.eot?#iefix")
-      format("embedded-opentype"),
-    url("fonts/HindSiliguri-Regular_1.woff2") format("woff2"),
-    url("fonts/HindSiliguri-Regular_1.woff") format("woff"),
-    url("fonts/HindSiliguri-Regular_1.ttf") format("truetype"),
-    url("fonts/HindSiliguri-Regular_1.svg#HindSiliguri-Regular") format("svg");
-  font-weight: normal;
   font-style: normal;
   font-display: swap;
 }

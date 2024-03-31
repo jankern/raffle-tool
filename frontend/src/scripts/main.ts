@@ -109,12 +109,29 @@ document.addEventListener("DOMContentLoaded", () => {
             consecutivelyIterator = 0;
             raffleStateContainer.setState({ view: "raffle" });
             stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "inline-block", "none", "inline-block");
-            stateOrderContentLayer('raffle');
 
+            // If winners alreday exist and the screen gets accessed again, it indicates the old results with an overlay
             if (raffleStateContainer.getState().winners.length > 0) {
                 rafflePerform.style.display = "none";
                 raffleRepeat.style.display = "inline-block";
+
+                // Overlay 
+                // It exists
+                const overlayOldWinners = document.getElementById('overlay-old-winners');
+                if (overlayOldWinners) {
+                    overlayOldWinners.style.display = "block";
+                } else {
+                    // It has to be created
+                    const overlayOldWiners = document.createElement('div');
+                    overlayOldWiners.id = "overlay-old-winners";
+                    const raffleContainer = document.getElementById('raffle');
+                    if (raffleContainer) {
+                        raffleContainer.appendChild(overlayOldWiners);
+                    }
+                }
             }
+
+            stateOrderContentLayer('raffle');
         });
 
         // Eventmethod for winner number
@@ -498,6 +515,10 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
                 renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
+                // Close winner table if open
+                winnersTableOutput.style.display = "none";
+                hideSummary(false);
+
                 // Set view and state for summary
                 raffleSummaryEvent();
                 raffleWinnerHeadline.textContent = raffleStateContainer.getState().name;
@@ -601,6 +622,13 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
             // Set menu display when stepped raffle is done
             stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "inline-block", "none", "inline-block");
+
+            // Remove overlay
+            const overlayOldWinners = document.getElementById('overlay-old-winners');
+            if (overlayOldWinners) {
+                overlayOldWinners.style.display = "none";
+            }
+
         });
 
         // Call radio selection for winner at page load
@@ -630,7 +658,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             numberOfWinnersTotal = prices.length;
         }
 
-        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: <b>" + numberOfWinnersTotal + "</b>";
+        numberOfWinnersOutput.innerHTML = "So viele Gewinner werden ausgelost: <b>" + numberOfWinnersTotal + "</b><br>&nbsp;";
 
         if (prices.length > 0) {
             pricesOutput.innerHTML = `Diese Preise werden an die Gewinner verteilt:`;
@@ -722,6 +750,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             priceHeadColumn = "<th>Preis</th>";
         }
 
+        winnersTableOutput.style.display = "block";
         winnersTableOutput.innerHTML = `<div class="row submenu"><div class="column column-1-3">
         <button type="type" class="internal" id="hideWinnersTable" name="hideWinnersTable">Gewinnertabelle ausblenden</buuton>
         <button type="button" class="internal icon right" id="copy-table-to-clipboard" title="Tabelle in Clipboard kopieren."><span class="material-icons">

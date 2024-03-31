@@ -157,15 +157,24 @@ header {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: flex-start;
   min-height: calc(100% - 20px);
   width: 100%;
-  padding: 190px 0 50px 0;
+  padding: 175px 0 50px 0;
   box-sizing: border-box;
   background: $background;
 }
 
 .content {
   width: 800px;
+  padding: 15px 0px;
+}
+
+.content-wrapper.raffle {
+  .content {
+    width: 100%;
+    padding: 15px 20px;
+  }
 }
 
 footer {
@@ -204,11 +213,11 @@ button {
     margin-top: -4px;
   }
 
-  &.icon{
+  &.icon {
     padding-bottom: 4px;
   }
 
-  span.material-icons{
+  span.material-icons {
     font-size: 1.1em;
   }
 
@@ -263,7 +272,7 @@ label {
     -webkit-appearance: none; /* Remove default Safari styles */
     display: inline-block;
     box-sizing: border-box;
-    width:auto;
+    width: auto;
     margin-left: 3px;
     background-color: white; /* Set background color */
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>'); /* Add custom drop-down arrow */
@@ -292,15 +301,15 @@ select:focus {
   padding: 5px 0;
   margin: 10px 0;
 
-  &.submenu{
+  &.submenu {
     background: $primary-light;
     border-radius: 3px;
     padding: 10px 5px 5px;
-    .column{
+    .column {
       display: block;
     }
-    .right{
-      float:right;
+    .right {
+      float: right;
     }
   }
 
@@ -369,6 +378,7 @@ select:focus {
     padding: 10px;
     width: 50%;
     box-sizing: border-box;
+    overflow-wrap: break-word;
 
     &.left {
       background: $row;
@@ -396,7 +406,6 @@ select:focus {
       line-break: anywhere;
 
       &.prices-and-winner {
-        
         th,
         tr {
           width: 50%;
@@ -422,9 +431,9 @@ select:focus {
       padding: 20px;
       border-radius: 3px;
       color: white;
-      width: calc(50% - 5px);
+      width: 250px;
       margin: 5px 5px 0px 0;
-      min-height: 150px;
+      min-height: 130px;
 
       div {
         display: inline-block;
@@ -436,10 +445,24 @@ select:focus {
   }
 }
 
-#participants-table-output, #winners-table-output {
+#overlay-old-winners{
+  width:100%;
+  position:absolute;
+  height:100%;
+  box-sizing: border-box;
+  background: black;
+  opacity: 0.4;
+}
+
+#participants-table-output,
+#winners-table-output {
   .winner {
     background: $winner;
   }
+}
+
+#winners-table-output {
+  display: none;
 }
 
 .excluded-from-raffle {

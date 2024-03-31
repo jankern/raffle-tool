@@ -124,6 +124,6 @@ export class Raffle {
         const firstName = match[1];
         const lastNameInitial = match[2];
 
-        return firstName + " " + lastNameInitial;
+        return firstName + " " + lastNameInitial + ".";
     }
 }

@@ -53,7 +53,6 @@ export class RaffleStateContainer {
             } else {
 
                 if (fileInputType === "supporter") {
-                    console.log('in Supporter');
                     // Extract required columns
                     // Extract first 4 columns
                     const [firstName, lastName, email, supporterType] = columns.slice(0, 4);
@@ -63,8 +62,6 @@ export class RaffleStateContainer {
                     // Add the index of subscription_state
                     const subscriptionState: string = subscriptionStateIndex !== -1 ? columns[subscriptionStateIndex] : '';
 
-                    console.log('in row ' + i + " " + email);
-
                     if (subscriptionState !== "" && email !== "") {
                         const isActive = subscriptionState.toLowerCase() === 'active' ? true : false;
                         const supporterTypeReplaced = supporterType.replace("SequencerTalk Supporter ", "");
@@ -73,7 +70,6 @@ export class RaffleStateContainer {
                         participants.push({ id: this.participantAmount, firstName, lastName, email, supporterType: supporterTypeReplaced, isActive, hasNewsletter });
                     }
                 } else {
-                    console.log('in Newsletter');
                     const [email] = columns.slice(0, 1);
                     // Create participant object and add it to the list
                     if (email !== "") {
@@ -84,10 +80,7 @@ export class RaffleStateContainer {
 
                 this.participantAmount++;
             }
-
         }
-
-
 
         // Update state with new participants
         if (isParticipantsReset) {

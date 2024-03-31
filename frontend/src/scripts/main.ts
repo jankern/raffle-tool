@@ -7,12 +7,12 @@ import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
 
+import '@material-design-icons/font';
 import "../scss/styles.scss";
 
 document.addEventListener("DOMContentLoaded", () => {
 
     // Input / radio elements
-    const headerEl = document.getElementById('header') as HTMLElement;
     const numberOfWinnersRadio = document.getElementById('numberOfWinnersRadio') as HTMLInputElement;
     const numberOfSupporterWinnersInput = document.getElementById('numberOfSupporterWinners') as HTMLInputElement;
     const numberOfNewsletterWinnersInput = document.getElementById('numberOfNewsletterWinners') as HTMLInputElement;
@@ -40,16 +40,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Output / summary elements
     const validationOutput = document.getElementById('validation-output') as HTMLElement;
-    const participantsOutput = document.getElementById('participants-output') as HTMLElement;
+    const participantsTableOutput = document.getElementById('participants-table-output') as HTMLElement;
+    const winnersTableOutput = document.getElementById('winners-table-output') as HTMLElement;
     const numberOfWinnersOutput = document.getElementById('number-of-winners-output') as HTMLElement;
     const pricesOutput = document.getElementById('prices-output') as HTMLElement;
-    const hasNewsletterOutput = document.getElementById('has-newletter-output') as HTMLElement;
+    const hasNewsletterOutput = document.getElementById('has-newsletter-output') as HTMLElement;
     const winnerOutput = document.getElementById('winner-output') as HTMLElement;
 
     let consecutivelyIterator: number = 0;
 
     // Menu buttons initial states
-    raffleInfo.style.display = "inline-block"; 
+    raffleInfo.style.display = "inline-block";
     raffleCreate.style.display = "none";
     raffleCreateReset.style.display = "none";
     raffleSummary.style.display = "none";
@@ -582,7 +583,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                         stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "none", "inline-block", "inline-block");
                     }
                     raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
-                } 
+                }
             }
         });
 
@@ -593,7 +594,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             renderParticipantList(raffleStateContainer.getState().participants, numberOfWinnersTotal);
 
             rafflePerform.textContent = "Raffle";
-            raffleWinnerHeadline.textContent = "Raffle GO!!!"
+            raffleWinnerHeadline.textContent = raffleStateContainer.getState().name;
             raffleStateContainer.setState({ view: 'raffle', winners: [] });
             winnerOutput.innerHTML = "";
             consecutivelyIterator = 0;
@@ -649,8 +650,8 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
     // Function to render the participant list on the HTML page
     function renderParticipantList(participants: Participant[], numberOfWinnersTotal: number) {
 
-        participantsOutput.innerHTML = `Die <b>${numberOfWinnersTotal}</b> Gewinner werden aus folgender Liste (${raffleStateContainer.getState().participants.length}) ermittelt:<br>`;
-        let table = `<table id="participantTable"><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th>`;
+        participantsTableOutput.innerHTML = `Die <b>${numberOfWinnersTotal}</b> Gewinner werden aus folgender Liste (${raffleStateContainer.getState().participants.length}) ermittelt:<br>`;
+        let table = `<table id="participantTable"><tr><th>Name</th><th>E-Mail</th><th>SequencerTalk Supporter</th><th>isActive</th><th>hasNewsletter</th></tr>`;
 
         participants.forEach(participant => {
 
@@ -677,14 +678,18 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         });
 
         table += "</table>";
-        participantsOutput.innerHTML += table;
+        participantsTableOutput.innerHTML += table;
     }
 
     // Function to update the participant table after the raffle
-    function updateParticipantListAndPrices() {
+    function updateParticipantListAndPrices(): void {
 
         if (raffleStateContainer.getState().winners.length > 0) {
 
+            // Generate additionally winners table if winners are available
+            renderWinnerList(raffleStateContainer.getState().winners, raffleStateContainer.getState().prices);
+
+            // Update values in participnat table
             const winnerTableRows = document.querySelectorAll('#participantTable tbody tr');
 
             if (winnerTableRows && winnerTableRows.length > 0) {
@@ -708,7 +713,112 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 });
             }
         }
+    }
 
+    function renderWinnerList(winners: Winner[], prices: Price[]): void {
+
+        let priceHeadColumn: string = "";
+        if (raffleStateContainer.getState().prices.length > 0) {
+            priceHeadColumn = "<th>Preis</th>";
+        }
+
+        winnersTableOutput.innerHTML = `<div class="row submenu"><div class="column column-1-3">
+        <button type="type" class="internal" id="hideWinnersTable" name="hideWinnersTable">Gewinnertabelle ausblenden</buuton>
+        <button type="button" class="internal icon right" id="copy-table-to-clipboard" title="Tabelle in Clipboard kopieren."><span class="material-icons">
+        content_paste</span></button></div></div>`;
+
+        let table = `<table id="winnersTable"></thead><tr><th width="30">Spot</th><th>Name</th><th>E-Mail</th><th>Typ</th>${priceHeadColumn}</tr></thead></body>`;
+
+        // Reverse array and add price if available
+        const reversedWinners: Winner[] = [...winners].reverse();
+
+        // Print all winners together in reversed order
+        table += reversedWinners.reverse().map(winner => {
+            let priceText: string = "";
+            let participiantType: string = "";
+
+            if (raffleStateContainer.getState().prices.length > 0) {
+                const price = raffleStateContainer.getState().prices.find(price => price.id === winner.priceId);
+                if (price) {
+                    priceText = `<td>${price.priceText}</td>`;
+                }
+            }
+
+            if (winner.isSupporter) {
+                participiantType = "Supporter";
+            } else {
+                participiantType = "Newsletter";
+            }
+
+            return `<tr class="winner"><td style="text-align:right">${winner.id}</td><td>${winner.name}</td><td>${winner.email}</td><td>${participiantType}</td>${priceText}</tr>`;
+        }).join('');
+
+        table += "</tbody></table>";
+        winnersTableOutput.innerHTML += table;
+
+        // Function to manage the summary view
+        const hideWinnersTable = document.getElementById('hideWinnersTable') as HTMLInputElement;
+        const copyTableToClicpboard = document.getElementById('copy-table-to-clipboard') as HTMLInputElement;
+
+        let toggle: boolean = false;
+
+        hideWinnersTable.addEventListener('click', (event: Event): void => {
+            if (!toggle) {
+                hideSummary(false);
+                hideWinnersTable.innerHTML = "Gewinnertabelle einblenden";
+                copyTableToClicpboard.style.display = "none";
+            } else {
+                hideSummary(true);
+                hideWinnersTable.innerHTML = "Zurück zur Übersicht";
+                copyTableToClicpboard.style.display = "inline-block";
+            }
+            toggle = !toggle;
+        });
+
+        copyTableToClicpboard.addEventListener('click', (event: Event): void => {
+            copyTableToClipboard('winnersTable');
+        });
+
+        hideSummary(true);
+    }
+
+    // Function to toggle visibility of summary elements
+    function hideSummary(hide: boolean): void {
+
+        const winnersTable = document.getElementById('winnersTable') as HTMLElement;
+        if (!winnersTable) {
+            return;
+        }
+
+        if (!hide) {
+            participantsTableOutput.style.display = "inline-table";
+            pricesOutput.style.display = "inline-table";
+            winnersTable.style.display = "none";
+        } else {
+            participantsTableOutput.style.display = "none";
+            pricesOutput.style.display = "none";
+            winnersTable.style.display = "inline-table";
+        }
+
+    }
+
+    // Clipboard copy
+    function copyTableToClipboard(tableId: string) {
+        const table = document.getElementById(tableId);
+        if (!table) {
+            console.error("Table not found.");
+            return;
+        }
+
+        const range = document.createRange();
+        range.selectNode(table);
+
+        try {
+            navigator.clipboard.writeText(table.innerText);
+            console.log("Table copied to clipboard.");
+        } catch (error) {
+            console.error("Failed to copy table to clipboard:", error);
+        }
     }
 
     // Function to update form inputs with state values
@@ -722,10 +832,8 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         prices: Price[];
         winners: Winner[];
     }) {
-        // if (raffleNameInput && includeNewsletterCheckbox && numberOfWinnersInput) { // TODO
-        if (raffleNameInput && numberOfSupporterWinnersInput) { // TODO
+        if (raffleNameInput && numberOfSupporterWinnersInput) {
             raffleNameInput.value = state.name;
-            //includeNewsletterCheckbox.checked = state.includeNewsletterParticipants;
             numberOfSupporterWinnersInput.value = state.numberOfSupporterWinners ? state.numberOfSupporterWinners.toString() : '';
             numberOfNewsletterWinnersInput.value = state.numberOfNewsletterWinners ? state.numberOfNewsletterWinners.toString() : '';
         }

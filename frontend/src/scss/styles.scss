@@ -31,15 +31,6 @@ $base-line-height: 26px;
 $header1-font-weight: $bold;
 $header2-font-weight: $regular;
 
-// @use '../../node_modules/@material/web/button/filled-button';
-// @use '../../node_modules/@material/web/button/outlined-button';
-// @use '../../node_modules/@material/web/checkbox/checkbox';
-// @use '../../node_modules/@material/web/chips/suggestion-chip';
-// @use '../../node_modules/@material/web/field/filled-field';
-// @use '../../node_modules/@material/web/radio/radio';
-// @use '../../node_modules/@material/web/textfield/filled-text-field';
-// @use '../../node_modules/@material/web/textfield/outlined-text-field';
-
 :root {
   --primary: #e38312;
   --on-primary: #ffffff;
@@ -201,7 +192,6 @@ button {
   border-style: solid;
   color: rgb(255, 255, 255);
   border-radius: 25px;
-  // margin: 10px;
   font-size: 1em;
   text-align: center;
   cursor: pointer;
@@ -212,6 +202,14 @@ button {
     padding: 7px;
     font-size: 0.9em;
     margin-top: -4px;
+  }
+
+  &.icon{
+    padding-bottom: 4px;
+  }
+
+  span.material-icons{
+    font-size: 1.1em;
   }
 
   &:disabled {
@@ -293,6 +291,18 @@ select:focus {
   box-sizing: border-box;
   padding: 5px 0;
   margin: 10px 0;
+
+  &.submenu{
+    background: $primary-light;
+    border-radius: 3px;
+    padding: 10px 5px 5px;
+    .column{
+      display: block;
+    }
+    .right{
+      float:right;
+    }
+  }
 
   .column {
     display: inline-block;
@@ -386,7 +396,7 @@ select:focus {
       line-break: anywhere;
 
       &.prices-and-winner {
-        background-color: $primary-light;
+        
         th,
         tr {
           width: 50%;
@@ -426,7 +436,7 @@ select:focus {
   }
 }
 
-#participants-output {
+#participants-table-output, #winners-table-output {
   .winner {
     background: $winner;
   }

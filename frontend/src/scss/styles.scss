@@ -4,6 +4,7 @@
 $primary: #e38312;
 $primary-light: #e6ba87;
 $secondary: #031136;
+$secondary-dark: #a0abe6;
 $tertiary: #082ce2;
 $error: #ec265b;
 $erros-background: #e6a9b9;
@@ -234,6 +235,64 @@ button {
   &#raffle-perform {
     background: $secondary;
     border-color: $secondary;
+  }
+
+  &.nav-raffle-perform{
+    background: $background;
+    border-color: $background;
+    color: $secondary;
+    border-radius: 60px;
+    position: absolute;
+    top: 50%;
+    left: calc(50% - 145px);
+    &:hover{
+      // background: $secondary-dark;
+      border-color: $secondary-dark;
+    }
+  }
+}
+
+.nav-raffle-perform .material-icons {
+  font-size: 4em;
+
+  &.l{
+    animation: spin1 1.9s linear infinite; /* Rotate continuously with a duration of 2 seconds */
+  }
+
+  &.m{
+    animation: spin2 2.1s linear infinite; /* Rotate continuously with a duration of 2 seconds */
+  }
+
+  &.r{
+    animation: spin3 1.5s linear infinite; /* Rotate continuously with a duration of 2 seconds */
+  }
+  
+}
+
+@keyframes spin1 {
+  60% {
+    transform: rotate(360deg); /* Start rotation from 0 degrees */
+  }
+  50% {
+    transform: rotate(0deg); /* Rotate to 360 degrees */
+  }
+}
+
+@keyframes spin2 {
+  10% {
+    transform: rotate(0deg); /* Start rotation from 0 degrees */
+  }
+  40% {
+    transform: rotate(360deg); /* Rotate to 360 degrees */
+  }
+}
+
+@keyframes spin3 {
+  30% {
+    transform: rotate(360deg); /* Start rotation from 0 degrees */
+  }
+  0% {
+    transform: rotate(0deg); /* Rotate to 360 degrees */
   }
 }
 

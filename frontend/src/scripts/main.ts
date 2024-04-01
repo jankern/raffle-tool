@@ -3,10 +3,15 @@
     Main ts file to handle the raffle project and controll the UI
 */
 
+// Import classes
 import { RaffleState, Participant, Winner, Price } from "./Interfaces";
 import { RaffleStateContainer } from "./RaffleState";
 import { Raffle } from "./Raffle";
 
+// Import third party
+import { gsap } from "gsap";
+
+// Import styles and fonts
 import '@material-design-icons/font';
 import "../scss/styles.scss";
 
@@ -30,6 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const raffleRepeat = document.getElementById('raffle-repeat') as HTMLButtonElement;
     const raffleDeterminationType = document.getElementById('raffle-determination-type') as HTMLButtonElement;
     const raffleWinnerHeadline = document.getElementById('raffle-winner-headline') as HTMLElement;
+    const navRafflePerform = document.getElementById('nav-raffle-perform') as HTMLElement;
 
     // Textfields / Selects
     const csvText = document.getElementById('csvText') as HTMLTextAreaElement;
@@ -48,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const winnerOutput = document.getElementById('winner-output') as HTMLElement;
 
     let consecutivelyIterator: number = 0;
+    let isAnimatingWinner = false;
 
     // Menu buttons initial states
     raffleInfo.style.display = "inline-block";
@@ -297,7 +304,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         raffleCreate.addEventListener('click', (event: Event): void => {
 
             // prevent form from general submit
-            event.preventDefault();
+            // event.preventDefault();
 
             let validationText: string = "";
             let raffleName: string = "";
@@ -398,7 +405,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
                 // Check if the overall participant list length matches the filled entries
                 if (state && state.numberOfSupporterParticipants !== undefined && state && state.numberOfNewsletterParticipants !== undefined) {
-                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < ((+numberOfSupporterWinnersInput.value) + (+numberOfSupporterWinnersInput.value))) {
+                    if (raffleStateContainer.getState().participants.length - inactiveParticipants < ((+numberOfSupporterWinnersInput.value) + (+numberOfNewsletterWinnersInput.value))) {
                         validationText += "Du kannst nicht mehr Gewinner als Teilnehmer definieren (max. " + (raffleStateContainer.getState().participants.length - inactiveParticipants) + ").<br>";
                     }
                 }
@@ -522,6 +529,7 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 // Set view and state for summary
                 raffleSummaryEvent();
                 raffleWinnerHeadline.textContent = raffleStateContainer.getState().name;
+                // Display raffle button
 
             } else {
                 // Show validation container and scroll to top
@@ -544,8 +552,46 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
         });
 
         // Function to perform the raffle game
-        rafflePerform.addEventListener('click', (event: Event): void => {
-            event.preventDefault();
+        async function rafflePerformEvent(): Promise<void> {
+
+            // prevent form from general submit
+            // event.preventDefault();
+
+            if (isAnimatingWinner) {
+                return;
+            }
+
+            // Start raffle button animation if it's simultaneously or teh first consecutively loop
+            if (consecutivelyIterator <= 0) {
+
+                gsap.to(navRafflePerform, {opacity: 1, display: 'block', duration: 0.3});
+
+                const dice1 = document.getElementById('r');
+                const dice2 = document.getElementById('m');
+                const dice3 = document.getElementById('l');
+                if (dice1 && dice2 && dice3) {
+                    dice1.className = "material-icons r";
+                    dice2.className = "material-icons m";
+                    dice3.className = "material-icons l";
+                }
+
+                isAnimatingWinner = true;
+
+                await new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        // Stop raffle button animation
+                        if (dice1 && dice2 && dice3) {
+                            dice1.className = "material-icons";
+                            dice2.className = "material-icons";
+                            dice3.className = "material-icons";
+                        }
+                        // Hide raffle button
+                        gsap.to(navRafflePerform, {opacity: 0, display: 'none', duration: 0.3});
+                        isAnimatingWinner = false;
+                        resolve();
+                    }, 3500);
+                });
+            }
 
             // Set view state
             raffleStateContainer.setState({ view: "raffle" });
@@ -560,20 +606,26 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
             const reversedWinners: Winner[] = [...raffleStateContainer.getState().winners].reverse();
 
             if (raffleStateContainer.getState().determinationType === "simultaneously") {
-                // Print all winners together in reversed order
-                winnerOutput.innerHTML = reversedWinners.reverse().map(winner => {
-                    let priceText = "";
-                    if (raffleStateContainer.getState().prices.length > 0) {
-                        const price = raffleStateContainer.getState().prices.find(price => price.id === winner.priceId);
-                        if (price) {
-                            priceText = "<br>" + price.priceText;
-                        }
-                    }
-                    const winnerName: string = winner.name === "" || winner.name === " " ? raffle.shortenEmailUsername(winner.email, 50, false) : raffle.shortenName(winner.name);
-                    return `<div class="info-box winner"><div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}</div>`;
-                }).join('');
 
-                rafflePerform.textContent = raffleStateContainer.getState().name;
+                // Clear the winner output before adding new winners
+                winnerOutput.innerHTML = "";
+
+                // Check if animateWinner is already running
+                if (!isAnimatingWinner) {
+                    isAnimatingWinner = true;
+                    // Loop through each winner and animate them sequentially
+                    let promiseChain: Promise<void> = Promise.resolve();
+                    let i = 0;
+                    raffleStateContainer.getState().winners.forEach((winner, i) => {
+                        promiseChain = promiseChain.then(() => animateWinner(winner, i));
+                        i += 1;
+                    });
+                    // Reset the flag to indicate animation end when promise is resolved
+                    promiseChain.finally(() => {
+                        isAnimatingWinner = false;
+                    });
+                }
+
                 raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
 
                 stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "none", "inline-block", "inline-block");
@@ -581,18 +633,20 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                 // Print winners consecutively
                 if (consecutivelyIterator < reversedWinners.length) {
                     const winner = reversedWinners[consecutivelyIterator];
-                    let priceText = "";
-                    if (raffleStateContainer.getState().prices.length > 0) {
-                        const price = raffleStateContainer.getState().prices.find(price => price.id === winner.priceId);
-                        if (price) {
-                            priceText = "<br>" + price.priceText;
+
+                    // Check if animateWinner is already running
+                    if (!isAnimatingWinner) {
+                        // Animate the winner only if the previous animation has finished
+                        isAnimatingWinner = true; // Set the flag to indicate animation start
+                        try {
+                            await animateWinner(reversedWinners[consecutivelyIterator], consecutivelyIterator,);
+                        } catch (error) {
+                            console.error("Animation error:", error);
+                        } finally {
+                            isAnimatingWinner = false; // Reset the flag to indicate animation end
                         }
                     }
-                    let el = document.createElement("div");
-                    el.className = "info-box winner";
-                    winnerOutput.prepend(el);
-                    const winnerName: string = winner.name === "" || winner.name === " " ? raffle.shortenEmailUsername(winner.email, 50, false) : raffle.shortenName(winner.name);
-                    el.innerHTML = `<div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}`;
+
                     consecutivelyIterator++;
 
                     // Set menu display
@@ -604,11 +658,44 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
                         stateDisplayForMenuAndPages("none", "none", "none", "inline-block", "none", "none", "inline-block", "inline-block");
                     }
                     raffleWinnerHeadline.textContent = "Das sind die Gewinner:";
+
                 }
             }
-        });
+        }
+
+        // Function to animate each winner
+        function animateWinner(winner: Winner, i: number): Promise<void> {
+            return new Promise<void>((resolve) => {
+                // Create HTML for the winner
+                let priceText = "";
+                if (raffleStateContainer.getState().prices.length > 0) {
+                    const price = raffleStateContainer.getState().prices.find(price => price.id === winner.priceId);
+                    if (price) {
+                        priceText = "<br>" + price.priceText;
+                    }
+                }
+                const winnerName = winner.name === "" || winner.name === " " ? raffle.shortenEmailUsername(winner.email, 50, false) : raffle.shortenName(winner.name);
+                const winnerHTML = `<div class="info-box winner" id="winner-${i}"><div class="column-left">${winner.id}.</div><div class="column-right"><b>${winnerName}</b></div>${priceText}</div>`;
+
+                // Append the winner HTML to the winnerOutput
+                winnerOutput.innerHTML += winnerHTML;
+
+                // Animate the opacity of the newly added winner
+                // gsap.fromTo(`#winner-${i}`, { opacity: 0, duration: 0.2, width: '200px', minHeight: '100px'}, { opacity: 1, duration: 1, width: '250px', minHeight: '130px', ease: "elastic.out(1,0.3)", onComplete: resolve }); // Resolve the promise when the animation is complete
+                gsap.fromTo(".info-box.winner:last-child", { opacity: 0, width: '250px', minHeight: '130px'}, { opacity: 1, duration: 1, width: '250px', minHeight: '130px', ease: "power3.out", onComplete: resolve }); // Resolve the promise when the animation is complete
+                //gsap.from(".info-box.winner:last-child", { duration: 1, opacity: 0, ease: "elastic.out(1,0.3)", onComplete: resolve });
+            });
+        };
+
+        // Event listener to call raffle perform function
+        rafflePerform.addEventListener('click', rafflePerformEvent);
+        navRafflePerform.addEventListener('click', rafflePerformEvent);
 
         raffleRepeat.addEventListener('click', function (event) {
+
+            if (isAnimatingWinner) {
+                return;
+            }
 
             // Output summary
             const numberOfWinnersTotal = renderRaffleData(raffleStateContainer.getState().prices, raffleStateContainer.getState().numberOfWinners, raffleStateContainer.getState().includeNewsletterParticipants);
@@ -616,6 +703,9 @@ mail-29@example.de,2024-03-20 08:43:10.035321Z`;
 
             rafflePerform.textContent = "Raffle";
             raffleWinnerHeadline.textContent = raffleStateContainer.getState().name;
+            // Display raffle button
+            gsap.to(navRafflePerform, {opacity: 1, display: 'block', duration: 0.3});
+
             raffleStateContainer.setState({ view: 'raffle', winners: [] });
             winnerOutput.innerHTML = "";
             consecutivelyIterator = 0;

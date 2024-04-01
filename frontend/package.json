@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@material-design-icons/font": "^0.14.13",
+    "gsap": "^3.12.5",
     "node-sass": "^9.0.0",
     "typescript": "^5.2.2"
   }

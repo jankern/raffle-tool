@@ -1,6 +1,6 @@
 # Raffle
 
-A simple raffle application, that takes two csv files as input to include two types of raffle participants.
+A simple community raffle application, that takes two csv files as input to include two types of raffle participants.
 You can determine a number of winners and optionally define prices.
 The draw will then be made from the pool of participants in the input files.
 

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "node esbuild.config.js",
-    "start": "npm run build && npx live-server --port=8080 --open=../static/index.html",
+    "start": "npm run build && npx live-server --port=8080 --open=../templates/index.html",
     "copy-html": "node copy-html.js"
   },
   "keywords": [],

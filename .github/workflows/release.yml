@@ -37,6 +37,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
+          update: true  # Update existing release if it exists
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1

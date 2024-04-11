@@ -32,6 +32,7 @@ jobs:
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
+          echo $RESPONSE
           RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
           if [ "$RELEASE_ID" = "null" ]; then
             echo "Release with tag '${{ github.ref }}' not found."

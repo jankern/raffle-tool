@@ -6,7 +6,7 @@ esbuild
   .build({
     entryPoints: ["./src/scripts/main.ts"],
     bundle: true,
-    outfile: "../build/sequencer-talk-raffle-tool/static/bundle.js",
+    outfile: "../build/raffle-tool/static/bundle.js",
     sourcemap: false,
     // watch: true,
     minify: true, // Minify the output
@@ -29,7 +29,7 @@ esbuild
         resolveFrom: "cwd",
         assets: {
           from: ["../templates/index.html"],
-          to: ["../build/sequencer-talk-raffle-tool/"],
+          to: ["../build/raffle-tool/"],
         },
        // watch: true,
       }),

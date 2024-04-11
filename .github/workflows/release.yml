@@ -29,20 +29,25 @@ jobs:
       - name: Get Latest Release ID
         id: get_release_id
         run: |
-          RELEASE_ID=$(curl -s -X GET \
+          RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
-            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}" | jq -r '.id')
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
+          RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
+          if [ "$RELEASE_ID" = "null" ]; then
+            echo "Release with tag '${{ github.ref }}' not found."
+            exit 1
+          fi
           echo "::set-output name=release_id::$RELEASE_ID"
 
       - name: Update Release
         if: steps.get_release_id.outputs.release_id != null
         run: |
           RELEASE_ID="${{ steps.get_release_id.outputs.release_id }}"
-          curl -s -X PATCH \
+          RESPONSE=$(curl -s -X PATCH \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             -H "Accept: application/vnd.github.v3+json" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}" \
-            -d "{\"tag_name\": \"${{ github.ref }}\", \"name\": \"Release ${{ github.ref }}\", \"draft\": false, \"prerelease\": false}"
+            -d "{\"tag_name\": \"${{ github.ref }}\", \"name\": \"Release ${{ github.ref }}\", \"draft\": false, \"prerelease\": false}")
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1

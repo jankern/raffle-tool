@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20"
+          node-version: "20" # Specify a valid Node.js version
 
       - name: Install Dependencies
         run: npm install
@@ -32,12 +32,7 @@ jobs:
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
-          echo $RESPONSE
-          #RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
-          #if [ "$RELEASE_ID" = "null" ]; then
-          #  echo "Release with tag '${{ github.ref }}' not found."
-          #  exit 1
-          #fi
+          RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
           echo "::set-output name=release_id::$RELEASE_ID"
 
       - name: Update Release
@@ -51,11 +46,12 @@ jobs:
             -d "{\"tag_name\": \"${{ github.ref }}\", \"name\": \"Release ${{ github.ref }}\", \"draft\": false, \"prerelease\": false}")
 
       - name: Upload Release Asset
+        if: steps.get_release_id.outputs.release_id != null
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/raffle-tool
+          upload_url: ${{ steps.get_release_id.outputs.upload_url }} # Correct reference to get_release_id
+          asset_path: ./build/sequencer-talk-raffle-tool # Adjusted asset path
           asset_name: raffle-tool-${{ github.ref }}.zip
           asset_content_type: application/zip

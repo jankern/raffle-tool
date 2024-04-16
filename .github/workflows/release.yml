@@ -34,6 +34,7 @@ jobs:
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
+          echo $RELEASE
           RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
           echo "RELEASE_ID"
           echo $RELEASE_ID

@@ -36,10 +36,10 @@ jobs:
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
           RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
           echo "RELEASE_ID"
-          echo RELEASE_ID
+          echo $RELEASE_ID
           UPLOAD_URL=$(echo $RESPONSE | jq -r '.upload_url')
           echo "UPLOAD_URL"
-          echo UPLOAD_URL
+          echo $UPLOAD_URL
           if [ "$RELEASE_ID" = "null" ]; then
             echo "Release with tag '${{ github.ref }}' not found."
             exit 1

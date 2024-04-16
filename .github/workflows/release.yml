@@ -57,7 +57,6 @@ jobs:
           RELEASE_ID="${{ steps.get_release_id.outputs.release_id }}"
           UPLOAD_URL="${{ steps.get_release_id.outputs.upload_url }}"
           echo "Uploading release asset..."
-          curl -X POST -s -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
-            -H "Content-Type: application/zip" \
-            --data-binary "@./build/sequencer-talk-raffle-tool" \
-            "$UPLOAD_URL?name=raffle-tool-${{ github.ref }}.zip"
+          echo "Release ID: $RELEASE_ID"
+          echo "Upload URL: $UPLOAD_URL"
+          # Add your asset upload command here using the RELEASE_ID and UPLOAD_URL

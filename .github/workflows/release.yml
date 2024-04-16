@@ -29,6 +29,8 @@ jobs:
       - name: Get Latest Release ID
         id: get_release_id
         run: |
+          echo ${GITHUB_REPOSITORY}
+          echo ${{ github.ref }}
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")

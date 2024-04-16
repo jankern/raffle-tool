@@ -33,7 +33,13 @@ jobs:
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
           RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
+          UPLOAD_URL=$(echo $RESPONSE | jq -r '.upload_url')
+          if [ "$RELEASE_ID" = "null" ]; then
+            echo "Release with tag '${{ github.ref }}' not found."
+            exit 1
+          fi
           echo "::set-output name=release_id::$RELEASE_ID"
+          echo "::set-output name=upload_url::$UPLOAD_URL"
 
       - name: Update Release
         if: steps.get_release_id.outputs.release_id != null
@@ -47,11 +53,11 @@ jobs:
 
       - name: Upload Release Asset
         if: steps.get_release_id.outputs.release_id != null
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        with:
-          upload_url: ${{ steps.get_release_id.outputs.upload_url }} # Correct reference to get_release_id
-          asset_path: ./build/sequencer-talk-raffle-tool # Adjusted asset path
-          asset_name: raffle-tool-${{ github.ref }}.zip
-          asset_content_type: application/zip
+        run: |
+          RELEASE_ID="${{ steps.get_release_id.outputs.release_id }}"
+          UPLOAD_URL="${{ steps.get_release_id.outputs.upload_url }}"
+          echo "Uploading release asset..."
+          curl -X POST -s -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
+            -H "Content-Type: application/zip" \
+            --data-binary "@./build/sequencer-talk-raffle-tool" \
+            "$UPLOAD_URL?name=raffle-tool-${{ github.ref }}.zip"

@@ -16,7 +16,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "20" # Specify a valid Node.js version
+          node-version: "14" # Specify a valid Node.js version
 
       - name: Install Dependencies
         run: npm install
@@ -28,25 +28,22 @@ jobs:
 
       - name: Get Latest Release ID
         id: get_release_id
+        if: github.ref
         run: |
-          echo ${GITHUB_REPOSITORY}
           echo ${{ github.ref }}
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
-          echo $RESPONSE
-          RELEASE_ID=$(echo $RESPONSE | jq -r '.id')
-          echo "RELEASE_ID"
-          echo $RELEASE_ID
-          UPLOAD_URL=$(echo $RESPONSE | jq -r '.upload_url')
-          echo "UPLOAD_URL"
-          echo $UPLOAD_URL
+          if [ "$(echo "$RESPONSE" | jq '.message')" != "null" ]; then
+            echo "Error: $(echo "$RESPONSE" | jq -r '.message')"
+            exit 1
+          fi
+          RELEASE_ID=$(echo "$RESPONSE" | jq -r '.id')
           if [ "$RELEASE_ID" = "null" ]; then
             echo "Release with tag '${{ github.ref }}' not found."
             exit 1
           fi
           echo "::set-output name=release_id::$RELEASE_ID"
-          echo "::set-output name=upload_url::$UPLOAD_URL"
 
       - name: Update Release
         if: steps.get_release_id.outputs.release_id != null
@@ -60,10 +57,11 @@ jobs:
 
       - name: Upload Release Asset
         if: steps.get_release_id.outputs.release_id != null
-        run: |
-          RELEASE_ID="${{ steps.get_release_id.outputs.release_id }}"
-          UPLOAD_URL="${{ steps.get_release_id.outputs.upload_url }}"
-          echo "Uploading release asset..."
-          echo "Release ID: $RELEASE_ID"
-          echo "Upload URL: $UPLOAD_URL"
-          # Add your asset upload command here using the RELEASE_ID and UPLOAD_URL
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release_id.outputs.upload_url }} # Correct reference to get_release_id
+          asset_path: ./build/raffle-tool # Adjusted asset path
+          asset_name: raffle-tool-${{ github.ref }}.zip
+          asset_content_type: application/zip

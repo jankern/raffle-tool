@@ -31,6 +31,7 @@ jobs:
         if: github.ref
         run: |
           echo ${{ github.ref }}
+          echo ${GITHUB_REPOSITORY}
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")

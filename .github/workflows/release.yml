@@ -35,10 +35,10 @@ jobs:
           RESPONSE=$(curl -s -X GET \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${{ github.ref }}")
-          if [ "$(echo "$RESPONSE" | jq '.message')" != "null" ]; then
-            echo "Error: $(echo "$RESPONSE" | jq -r '.message')"
-            exit 1
-          fi
+          #if [ "$(echo "$RESPONSE" | jq '.message')" != "null" ]; then
+          #  echo "Error: $(echo "$RESPONSE" | jq -r '.message')"
+          #  exit 1
+          #fi
           RELEASE_ID=$(echo "$RESPONSE" | jq -r '.id')
           if [ "$RELEASE_ID" = "null" ]; then
             echo "Release with tag '${{ github.ref }}' not found."

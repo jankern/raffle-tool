@@ -1,0 +1,36 @@
+name: Create Release Bundle
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build TypeScript
+        run: npm run build
+
+      - name: Create release bundle
+        run: |
+          mkdir -p build/raffle-tool
+          zip -r build/raffle-tool/raffle-tool-build-${{ github.ref }}.zip dist
+
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v2
+        with:
+          name: raffle-tool-build-${{ github.ref }}
+          path: build/raffle-tool/raffle-tool-build-${{ github.ref }}.zip

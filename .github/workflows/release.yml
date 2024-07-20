@@ -26,8 +26,8 @@ jobs:
 
       - name: Create release bundle
         run: |
-          mkdir -p build/raffle-tool
-          zip -r build/raffle-tool/raffle-tool-build-${{ github.ref }}.zip frontend
+          echo ls -al build/raffle-tool
+          echo {{github.ref}}
 
       - name: Upload release bundle
         uses: actions/upload-artifact@v2

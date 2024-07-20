@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: '14'
 
       - name: Install dependencies
         run: npm install --prefix frontend
@@ -24,24 +24,16 @@ jobs:
       - name: Build TypeScript
         run: npm run build --prefix frontend
 
-      - name: Check if directory exists
-        run: |
-          if [ -d "build/raffle-tool" ]; then
-            echo "Directory 'build/raffle-tool' exists. Listing its contents:"
-            ls build/raffle-tool
-          else
-            echo "Directory 'build/raffle-tool' does not exist."
-          fi
-          echo "Current available tag ref: ${{ github.ref }}"
-
       - name: Create release bundle
         run: |
-          mkdir -p build/raffle-tool
-          cp -r frontend/build/* build/raffle-tool/
-          zip -r build/raffle-tool/raffle-tool-build-${{ github.ref }}.zip build/raffle-tool/
+          # Get the tag name without the prefix
+          TAG_NAME=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+
+          # Create the release bundle zip
+          zip -r build/raffle-tool/raffle-tool-build-${TAG_NAME}.zip build/raffle-tool/*
 
       - name: Upload release bundle
         uses: actions/upload-artifact@v2
         with:
-          name: raffle-tool-build-${{ github.ref }}
+          name: raffle-tool-build-${TAG_NAME}
           path: build/raffle-tool

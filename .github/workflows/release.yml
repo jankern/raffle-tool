@@ -26,8 +26,8 @@ jobs:
 
       - name: Zip build artifacts
         run: |
-          mkdir -p build
-          zip -r build/raffle-tool.zip build/raffle-tool
+          cd build
+          zip -r raffle-tool.zip raffle-tool
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -66,6 +66,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/raffle-tool.zip
+          asset_path: build/build-artifacts/raffle-tool.zip
           asset_name: raffle-tool.zip
           asset_content_type: application/zip

@@ -35,6 +35,20 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
           path: build/raffle-tool.zip
 
+      - name: Debug: List uploaded artifacts
+        uses: actions/github-script@v6
+        id: list-uploaded-artifacts
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log('Uploaded artifacts:');
+            for (const artifact of artifacts.data.artifacts) {
+              console.log(`- ${artifact.name}`);
+            }
+
   release:
     needs: build
     runs-on: ubuntu-latest
@@ -63,6 +77,14 @@ jobs:
 
       - name: Echo artifact name
         run: echo "Artifact to download - build-artifacts-${{ github.run_id }}"
+
+      - name: Debug: Check if the artifact exists
+        run: |
+          if [ -f build/raffle-tool.zip ]; then
+            echo "Artifact file exists"
+          else
+            echo "Artifact file does not exist"
+          fi
 
       - name: Download build artifacts
         uses: actions/download-artifact@v3

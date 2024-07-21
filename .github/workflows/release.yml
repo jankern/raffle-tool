@@ -1,3 +1,4 @@
+
 name: Release TypeScript App
 
 on:
@@ -19,15 +20,15 @@ jobs:
           node-version: '16'  # Specify the Node.js version you need
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --prefix frontend
 
       - name: Build the TypeScript app
-        run: npm run build
+        run: npm run build --prefix frontend
 
       - name: Zip build artifacts
         run: |
           mkdir -p build
-          zip -r build/raffle-tool.zip build/raffle-tool
+          zip -r build/raffle-tool.zip frontend/build/raffle-tool
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -39,33 +40,3 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
-          path: build
-
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: |
-            Automated release of the TypeScript app.
-          draft: false
-          prerelease: false
-
-      - name: Upload release assets
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/build-artifacts/build/raffle-tool.zip
-          asset_name: raffle-tool.zip
-          asset_content_type: application/zip

@@ -80,17 +80,17 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
           path: build
 
-      - name: Create GitHub Release
+      - name: Create or Update GitHub Release
         id: create_release
-        uses: actions/create-release@v1
+        run: |
+          release_id=$(gh api -X GET repos/${{ github.repository }}/releases/tags/${{ github.ref }} -q .id)
+          if [ -z "$release_id" ]; then
+            gh release create ${{ github.ref }} --title "Release ${{ github.ref }}" --notes "Automated release of the TypeScript app"
+          else
+            gh release update $release_id --title "Release ${{ github.ref }}" --notes "Automated release of the TypeScript app"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: Automated release of the TypeScript app
-          draft: false
-          prerelease: false
 
       - name: Upload release assets
         uses: actions/upload-release-asset@v1

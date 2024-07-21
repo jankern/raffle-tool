@@ -68,7 +68,7 @@ jobs:
         run: |
           if [ -f build ]; then
             echo "Artifact file exists in build"
-          elif [ -f build/rafle-tool ]; then
+          elif [ -f build/raffle-tool ]; then
             echo "Artifact file exists in build/raffle-tool"
           else
             echo "Artifact file does not exist"

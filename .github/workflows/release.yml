@@ -52,10 +52,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            console.log(artifacts);
+            if (artifacts.data.artifacts.length === 0) {
+              console.log('No artifacts found');
+            } else {
+              console.log('Found artifacts:');
+              for (const artifact of artifacts.data.artifacts) {
+                console.log(`- ${artifact.name}`);
+              }
+            }
 
       - name: Download build artifacts
-        if: ${{ steps.list-artifacts.outputs.artifacts.length > 0 }}
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts

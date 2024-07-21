@@ -67,12 +67,13 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        with:
-          tag_name: ${{ env.TAG_NAME }}
-          release_name: Release ${{ env.TAG_NAME }}
-          body: Automated release of the TypeScript app
-          draft: false
-          prerelease: false
+        run: |
+          release_id=$(gh api -X GET repos/${{ github.repository }}/releases/${{ env.TAG_NAME }} -q .id)
+          if [ -z "$release_id" ]; then
+            gh release create ${{ env.TAG_NAME }}
+          else
+            gh release edit ${{ env.TAG_NAME }}
+          fi
 
       - name: Upload release assets
         uses: actions/upload-release-asset@v1

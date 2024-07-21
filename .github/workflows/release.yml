@@ -43,7 +43,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: List available artifacts
+        uses: actions/github-script@v6
+        id: list-artifacts
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            console.log(artifacts);
+
       - name: Download build artifacts
+        if: ${{ steps.list-artifacts.outputs.artifacts.length > 0 }}
         uses: actions/download-artifact@v3
         with:
           name: build-artifacts
@@ -66,6 +78,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/build-artifacts/raffle-tool.zip
+          asset_path: build/raffle-tool.zip
           asset_name: raffle-tool.zip
           asset_content_type: application/zip

@@ -35,7 +35,7 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
           path: build/raffle-tool.zip
 
-      - name: Debug: List uploaded artifacts
+      - name: Debug - List uploaded artifacts
         uses: actions/github-script@v6
         id: list-uploaded-artifacts
         with:

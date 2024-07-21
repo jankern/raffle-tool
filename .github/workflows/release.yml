@@ -62,7 +62,7 @@ jobs:
             }
 
       - name: Echo artifact name
-        run: echo "Artifact to download - build-artifacts-${{ github.run_id }}"
+        run: echo "Artifact to download: build-artifacts-${{ github.run_id }}"
 
       - name: Download build artifacts
         uses: actions/download-artifact@v3

@@ -1,4 +1,4 @@
-name: Release TypeScript App
+name: CI Workflow
 
 on:
   push:
@@ -10,24 +10,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Specify the Node.js version you need
+          node-version: '16'
 
       - name: Install dependencies
         run: npm install --prefix frontend
 
-      - name: Build the TypeScript app
+      - name: Build project
         run: npm run build --prefix frontend
-
-      - name: Zip build artifacts
-        run: |
-          cd build
-          zip -r raffle-tool.zip raffle-tool
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -35,19 +30,19 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
           path: build
 
-  release:
+  deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Extract tag name
         id: extract_tag
         run: echo "TAG_NAME=$(basename ${{ github.ref }})" >> $GITHUB_ENV
 
-      - name: List artifacts in repository
+      - name: List uploaded artifacts
         uses: actions/github-script@v6
         id: list-artifacts
         with:
@@ -56,17 +51,10 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            if (artifacts.data.artifacts.length === 0) {
-              console.log('No artifacts found');
-            } else {
-              console.log('Artifacts found');
-              artifacts.data.artifacts.forEach(artifact => {
-                console.log(`- ${artifact.name}`);
-              });
-            }
-
-      - name: Print artifact name
-        run: echo "Artifact to download is build-artifacts-${{ github.run_id }}"
+            console.log('Artifacts found:');
+            artifacts.data.artifacts.forEach(artifact => {
+              console.log(`- ${artifact.name}`);
+            });
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -74,17 +62,17 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
           path: build
 
-      - name: Create or Update GitHub Release
+      - name: Create GitHub Release
         id: create_release
-        run: |
-          release_id=$(gh api -X GET repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }} -q .id)
-          if [ -z "$release_id" ]; then
-            gh release create ${{ github.ref }} --title "Release ${{ github.ref }}" --notes "Automated release of the TypeScript app"
-          else
-            gh release update $release_id --title "Release ${{ github.ref }}" --notes "Automated release of the TypeScript app"
-          fi
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+        with:
+          tag_name: ${{ env.TAG_NAME }}
+          release_name: Release ${{ env.TAG_NAME }}
+          body: Automated release of the TypeScript app
+          draft: false
+          prerelease: false
 
       - name: Upload release assets
         uses: actions/upload-release-asset@v1

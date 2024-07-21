@@ -33,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts-${{ github.run_id }}
-          path: build/raffle-tool.zip
+          path: build
 
   release:
     needs: build

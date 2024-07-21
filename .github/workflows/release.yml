@@ -59,7 +59,6 @@ jobs:
               for (const artifact of artifacts.data.artifacts) {
                 console.log(`- ${artifact.name}`);
               }
-              core.setOutput("artifact-name", `build-artifacts-${{ github.run_id }}`);
             }
 
       - name: Echo artifact name

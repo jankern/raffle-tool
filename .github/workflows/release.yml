@@ -15,8 +15,10 @@ jobs:
         with:
           node-version: '14'
       - name: Install dependencies
+        working-directory: ./frontend
         run: npm ci
       - name: Build app
+        working-directory: ./frontend
         run: npm run build
       - name: Create Release
         id: create_release

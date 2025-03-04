@@ -22,7 +22,11 @@ jobs:
         run: npm run build
       - name: Create version.json file
         run: |
-          echo '{"version":"'"${GITHUB_REF_NAME}"'", "date":"'"$(date --utc +%Y-%m-%dT%H:%M:%SZ)"'"}' > build/raffle-tool/static/version.json
+          echo '{
+            "version_number":"'"${GITHUB_REF_NAME}"'",
+            "date":"'"$(date --utc +%Y-%m-%dT%H:%M:%SZ)"'",
+            "build_number":'"${GITHUB_RUN_NUMBER}"'
+          }' > build/raffle-tool/static/version.json
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
